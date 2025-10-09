@@ -1,0 +1,36 @@
+      ******************************************************************
+      * DCLGEN TABLE(API8.CLIENT)                                      *
+      *        LIBRARY(API8.COB.CPY(CLIENT))                           *
+      *        LANGUAGE(COBOL)                                         *
+      *        NAMES(WS)                                               *
+      *        QUOTE                                                   *
+      *        COLSUFFIX(YES)                                          *
+      *        INDVAR(YES)                                             *
+      * ... IS THE DCLGEN COMMAND THAT MADE THE FOLLOWING STATEMENTS   *
+      ******************************************************************
+           EXEC SQL DECLARE API8.CLIENT TABLE
+           ( ID_CLIENT                      INTEGER NOT NULL,
+             NOM_CLIENT                     CHAR(20) NOT NULL,
+             PRENOM_CLIENT                  CHAR(20),
+             ADRESSE_CLIENT                 CHAR(30)
+           ) END-EXEC.
+      ******************************************************************
+      * COBOL DECLARATION FOR TABLE API8.CLIENT                        *
+      ******************************************************************
+       01  DCLCLIENT.
+      *                       ID_CLIENT
+           10 WSID-CLIENT          PIC S9(9) USAGE COMP.
+      *                       NOM_CLIENT
+           10 WSNOM-CLIENT         PIC X(20).
+      *                       PRENOM_CLIENT
+           10 WSPRENOM-CLIENT      PIC X(20).
+      *                       ADRESSE_CLIENT
+           10 WSADRESSE-CLIENT     PIC X(30).
+      ******************************************************************
+      * INDICATOR VARIABLE STRUCTURE                                   *
+      ******************************************************************
+       01  ICLIENT.
+           10 INDSTRUC           PIC S9(4) USAGE COMP OCCURS 4 TIMES.
+      ******************************************************************
+      * THE NUMBER OF COLUMNS DESCRIBED BY THIS DECLARATION IS 4       *
+      ******************************************************************
