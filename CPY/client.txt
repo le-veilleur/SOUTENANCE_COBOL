@@ -2,7 +2,7 @@
       * DCLGEN TABLE(API8.CLIENT)                                      *
       *        LIBRARY(API8.COB.CPY(CLIENT))                           *
       *        LANGUAGE(COBOL)                                         *
-      *        NAMES(WS)                                               *
+      *        NAMES(WS-)                                              *
       *        QUOTE                                                   *
       *        COLSUFFIX(YES)                                          *
       *        INDVAR(YES)                                             *
@@ -12,20 +12,20 @@
            ( ID_CLIENT                      INTEGER NOT NULL,
              NOM_CLIENT                     CHAR(10) NOT NULL,
              PRENOM_CLIENT                  CHAR(15),
-             ADRESSE_CLIENT                 CHAR(10)
+             ADRESSE_CLIENT                 CHAR(15)
            ) END-EXEC.
       ******************************************************************
       * COBOL DECLARATION FOR TABLE API8.CLIENT                        *
       ******************************************************************
        01  DCLCLIENT.
       *                       ID_CLIENT
-           10 WSID-CLIENT          PIC 9(10) USAGE COMP.
+           10 WS-ID-CLIENT         PIC S9(9) USAGE COMP.
       *                       NOM_CLIENT
-           10 WSNOM-CLIENT         PIC X(10).
+           10 WS-NOM-CLIENT        PIC X(10).
       *                       PRENOM_CLIENT
-           10 WSPRENOM-CLIENT      PIC X(15).
+           10 WS-PRENOM-CLIENT     PIC X(15).
       *                       ADRESSE_CLIENT
-           10 WSADRESSE-CLIENT     PIC X(10).
+           10 WS-ADRESSE-CLIENT    PIC X(15).
       ******************************************************************
       * INDICATOR VARIABLE STRUCTURE                                   *
       ******************************************************************

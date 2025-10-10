@@ -2,7 +2,7 @@
       * DCLGEN TABLE(API8.OPERATION)                                   *
       *        LIBRARY(API8.COB.CPY(OPE))                              *
       *        LANGUAGE(COBOL)                                         *
-      *        NAMES(WS)                                               *
+      *        NAMES(WS-)                                              *
       *        QUOTE                                                   *
       *        COLSUFFIX(YES)                                          *
       *        INDVAR(YES)                                             *
@@ -20,15 +20,15 @@
       ******************************************************************
        01  DCLOPERATION.
       *                       ID_OPERATION
-           10 WSID-OPERATION       PIC 9(10) USAGE COMP.
+           10 WS-ID-OPERATION      PIC S9(9) USAGE COMP.
       *                       ID_COMPTE
-           10 WSID-COMPTE          PIC 9(10) USAGE COMP.
+           10 WS-ID-COMPTE         PIC S9(9) USAGE COMP.
       *                       MONTANT_OP
-           10 WSMONTANT-OP         PIC S9(8)V9(2) USAGE COMP-3.
+           10 WS-MONTANT-OP        PIC S9(8)V9(2) USAGE COMP-3.
       *                       TYPE_OP
-           10 WSTYPE-OP            PIC X(1).
+           10 WS-TYPE-OP           PIC X(1).
       *                       DATE_OP
-           10 WSDATE-OP            PIC X(10).
+           10 WS-DATE-OP           PIC X(10).
       ******************************************************************
       * INDICATOR VARIABLE STRUCTURE                                   *
       ******************************************************************
