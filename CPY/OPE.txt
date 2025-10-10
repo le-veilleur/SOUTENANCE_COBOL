@@ -20,9 +20,9 @@
       ******************************************************************
        01  DCLOPERATION.
       *                       ID_OPERATION
-           10 WSID-OPERATION       PIC S9(9) USAGE COMP.
+           10 WSID-OPERATION       PIC 9(10) USAGE COMP.
       *                       ID_COMPTE
-           10 WSID-COMPTE          PIC S9(9) USAGE COMP.
+           10 WSID-COMPTE          PIC 9(10) USAGE COMP.
       *                       MONTANT_OP
            10 WSMONTANT-OP         PIC S9(8)V9(2) USAGE COMP-3.
       *                       TYPE_OP

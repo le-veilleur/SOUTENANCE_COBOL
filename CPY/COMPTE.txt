@@ -11,16 +11,17 @@
            EXEC SQL DECLARE API8.COMPTE TABLE
            ( ID_COMPTE                      INTEGER NOT NULL,
              ID_CLIENT                      INTEGER NOT NULL,
-             SOLDE                          DECIMAL(10, 2)
+             CODE_CB                        INTEGER NOT NULL. 
+             SOLDE                          DECIMAL(20, 2)
            ) END-EXEC.
       ******************************************************************
       * COBOL DECLARATION FOR TABLE API8.COMPTE                        *
       ******************************************************************
        01  DCLCOMPTE.
       *                       ID_COMPTE
-           10 WSID-COMPTE          PIC S9(9) USAGE COMP.
+           10 WSID-COMPTE          PIC 9(10) USAGE COMP.
       *                       ID_CLIENT
-           10 WSID-CLIENT          PIC S9(9) USAGE COMP.
+           10 WSID-CLIENT          PIC 9(10) USAGE COMP.
       *                       SOLDE
            10 WSSOLDE              PIC S9(8)V9(2) USAGE COMP-3.
       ******************************************************************

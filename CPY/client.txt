@@ -10,22 +10,22 @@
       ******************************************************************
            EXEC SQL DECLARE API8.CLIENT TABLE
            ( ID_CLIENT                      INTEGER NOT NULL,
-             NOM_CLIENT                     CHAR(20) NOT NULL,
-             PRENOM_CLIENT                  CHAR(20),
-             ADRESSE_CLIENT                 CHAR(30)
+             NOM_CLIENT                     CHAR(10) NOT NULL,
+             PRENOM_CLIENT                  CHAR(15),
+             ADRESSE_CLIENT                 CHAR(10)
            ) END-EXEC.
       ******************************************************************
       * COBOL DECLARATION FOR TABLE API8.CLIENT                        *
       ******************************************************************
        01  DCLCLIENT.
       *                       ID_CLIENT
-           10 WSID-CLIENT          PIC S9(9) USAGE COMP.
+           10 WSID-CLIENT          PIC 9(10) USAGE COMP.
       *                       NOM_CLIENT
-           10 WSNOM-CLIENT         PIC X(20).
+           10 WSNOM-CLIENT         PIC X(10).
       *                       PRENOM_CLIENT
-           10 WSPRENOM-CLIENT      PIC X(20).
+           10 WSPRENOM-CLIENT      PIC X(15).
       *                       ADRESSE_CLIENT
-           10 WSADRESSE-CLIENT     PIC X(30).
+           10 WSADRESSE-CLIENT     PIC X(10).
       ******************************************************************
       * INDICATOR VARIABLE STRUCTURE                                   *
       ******************************************************************
