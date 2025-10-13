@@ -1,0 +1,73 @@
+APNSE03  DFHMSD TYPE=&SYSPARM,                                         *
+               MODE=INOUT,                                             *
+               LANG=COBOL,                                             *
+               STORAGE=AUTO,                                           *
+               CTRL=FREEKB,                                            *
+               EXTATT=YES,                                             *
+               TERM=3270-2,                                            *
+               TIOAPFX=YES,                                            *
+               MAPATTS=(COLOR,HILIGHT,OUTLINE,PS,SOSI),                *
+               DSATTS=(COLOR,HILIGHT,OUTLINE,PS,SOSI)
+MAP1     DFHMDI SIZE=(24,80),                                          *
+               COLUMN=1,                                               *
+               LINE=1
+ DFHMDF                         POS=(3,7),LENGTH=66,                   *
+               INITIAL='************************************************
+               *******************',                                   *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(4,7),LENGTH=66,                   *
+               INITIAL='**************************** MENU DEPOT ********
+               *******************',                                   *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(5,7),LENGTH=66,                   *
+               INITIAL='************************************************
+               *******************',                                   *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(8,22),LENGTH=38,                  *
+               INITIAL='Veuillez choisir un montant de depot :',       *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(12,25),LENGTH=20,                 *
+               INITIAL='Montant du depot : ',                          *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+INPUTDEP DFHMDF POS=(12,50),LENGTH=4,                                  *
+               ATTRB=(UNPROT,IC,NORM),                                 *
+               HILIGHT=UNDERLINE,                                      *
+               COLOR=GREEN
+ DFHMDF                         POS=(12,55),LENGTH=0,                  *
+               ATTRB=ASKIP
+ DFHMDF                         POS=(13,55),LENGTH=0,                  *
+               ATTRB=ASKIP
+ DFHMDF                         POS=(16,26),LENGTH=19,                 *
+               INITIAL='Solde du compte  : ',                          *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+SOLDE DFHMDF          POS=(16,50),LENGTH=11,                           *
+               ATTRB=(UNPROT,NORM),                                    *
+               HILIGHT=OFF,                                            *
+               COLOR=GREEN
+ DFHMDF                         POS=(16,62),LENGTH=0,                  *
+               ATTRB=ASKIP
+MESDEP DFHMDF       POS=(18,3),LENGTH=70,                              *
+               ATTRB=(UNPROT,NORM),                                    *
+               HILIGHT=OFF,                                            *
+               COLOR=YELLOW
+ DFHMDF                         POS=(18,74),LENGTH=0,                  *
+               ATTRB=ASKIP
+ DFHMDF                         POS=(21,5),LENGTH=69,                  *
+               INITIAL='F1: HELP ; F2: SPLIT ; F3 : RETOUR ; ',        *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=BLUE
+AP3SE05  DFHMSD TYPE=FINAL
+         END
