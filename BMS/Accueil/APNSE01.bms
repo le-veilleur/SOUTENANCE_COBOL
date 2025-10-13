@@ -8,7 +8,7 @@ APNSE01  DFHMSD TYPE=&SYSPARM,                                         *
                TIOAPFX=YES,                                            *
                MAPATTS=(COLOR,HILIGHT,OUTLINE,PS,SOSI),                *
                DSATTS=(COLOR,HILIGHT,OUTLINE,PS,SOSI)
-MAP1     DFHMDI SIZE=(24,80),                                          *
+ACU1     DFHMDI SIZE=(24,80),                                          *
                COLUMN=1,                                               *
                LINE=1
  DFHMDF                         POS=(2,7),LENGTH=66,                   *
@@ -96,5 +96,5 @@ MESDEPRET DFHMDF POS=(20,5),LENGTH=70,                                 *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=BLUE
-AP3SE03  DFHMSD TYPE=FINAL
+APNSE01  DFHMSD TYPE=FINAL
          END

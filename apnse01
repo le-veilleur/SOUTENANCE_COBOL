@@ -1,0 +1,74 @@
+       01  ACU1I.
+           02  FILLER PIC X(12).
+           02  PASSCBL    COMP  PIC  S9(4).
+           02  PASSCBF    PICTURE X.
+           02  FILLER REDEFINES PASSCBF.
+             03 PASSCBA    PICTURE X.
+           02  FILLER   PICTURE X(6).
+           02  PASSCBI  PIC X(4).
+           02  IDCLIENTL    COMP  PIC  S9(4).
+           02  IDCLIENTF    PICTURE X.
+           02  FILLER REDEFINES IDCLIENTF.
+             03 IDCLIENTA    PICTURE X.
+           02  FILLER   PICTURE X(6).
+           02  IDCLIENTI  PIC X(10).
+           02  RETDEPL    COMP  PIC  S9(4).
+           02  RETDEPF    PICTURE X.
+           02  FILLER REDEFINES RETDEPF.
+             03 RETDEPA    PICTURE X.
+           02  FILLER   PICTURE X(6).
+           02  RETDEPI  PIC X(1).
+           02  MESCBL    COMP  PIC  S9(4).
+           02  MESCBF    PICTURE X.
+           02  FILLER REDEFINES MESCBF.
+             03 MESCBA    PICTURE X.
+           02  FILLER   PICTURE X(6).
+           02  MESCBI  PIC X(70).
+           02  MESDEPRETL    COMP  PIC  S9(4).
+           02  MESDEPRETF    PICTURE X.
+           02  FILLER REDEFINES MESDEPRETF.
+             03 MESDEPRETA    PICTURE X.
+           02  FILLER   PICTURE X(6).
+           02  MESDEPRETI  PIC X(70).
+       01  ACU1O REDEFINES ACU1I.
+           02  FILLER PIC X(12).
+           02  FILLER PICTURE X(3).
+           02  PASSCBC    PICTURE X.
+           02  PASSCBP    PICTURE X.
+           02  PASSCBH    PICTURE X.
+           02  PASSCBV    PICTURE X.
+           02  PASSCBU    PICTURE X.
+           02  PASSCBM    PICTURE X.
+           02  PASSCBO  PIC X(4).
+           02  FILLER PICTURE X(3).
+           02  IDCLIENTC    PICTURE X.
+           02  IDCLIENTP    PICTURE X.
+           02  IDCLIENTH    PICTURE X.
+           02  IDCLIENTV    PICTURE X.
+           02  IDCLIENTU    PICTURE X.
+           02  IDCLIENTM    PICTURE X.
+           02  IDCLIENTO  PIC X(10).
+           02  FILLER PICTURE X(3).
+           02  RETDEPC    PICTURE X.
+           02  RETDEPP    PICTURE X.
+           02  RETDEPH    PICTURE X.
+           02  RETDEPV    PICTURE X.
+           02  RETDEPU    PICTURE X.
+           02  RETDEPM    PICTURE X.
+           02  RETDEPO  PIC X(1).
+           02  FILLER PICTURE X(3).
+           02  MESCBC    PICTURE X.
+           02  MESCBP    PICTURE X.
+           02  MESCBH    PICTURE X.
+           02  MESCBV    PICTURE X.
+           02  MESCBU    PICTURE X.
+           02  MESCBM    PICTURE X.
+           02  MESCBO  PIC X(70).
+           02  FILLER PICTURE X(3).
+           02  MESDEPRETC    PICTURE X.
+           02  MESDEPRETP    PICTURE X.
+           02  MESDEPRETH    PICTURE X.
+           02  MESDEPRETV    PICTURE X.
+           02  MESDEPRETU    PICTURE X.
+           02  MESDEPRETM    PICTURE X.
+           02  MESDEPRETO  PIC X(70).
