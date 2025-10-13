@@ -1,35 +1,35 @@
       ******************************************************************
-      * DCLGEN TABLE(API8.CLIENT)                                      *
-      *        LIBRARY(API8.COB.CPY(CLIENT))                           *
+      * DCLGEN TABLE(API8.COMPTE)                                      *
+      *        LIBRARY(API8.COB.CPY(COMPTE))                           *
       *        LANGUAGE(COBOL)                                         *
-      *        NAMES(WS)                                               *
+      *        NAMES(WS-)                                              *
       *        QUOTE                                                   *
       *        COLSUFFIX(YES)                                          *
       *        INDVAR(YES)                                             *
       * ... IS THE DCLGEN COMMAND THAT MADE THE FOLLOWING STATEMENTS   *
       ******************************************************************
-           EXEC SQL DECLARE API8.CLIENT TABLE
-           ( ID_CLIENT                      INTEGER NOT NULL,
-             NOM_CLIENT                     CHAR(20) NOT NULL,
-             PRENOM_CLIENT                  CHAR(20),
-             ADRESSE_CLIENT                 CHAR(30)
+           EXEC SQL DECLARE API8.COMPTE TABLE
+           ( ID_COMPTE                      INTEGER NOT NULL,
+             ID_CLIENT                      INTEGER NOT NULL,
+             CODE_CB                        INTEGER NOT NULL,
+             SOLDE                          DECIMAL(10, 2)
            ) END-EXEC.
       ******************************************************************
-      * COBOL DECLARATION FOR TABLE API8.CLIENT                        *
+      * COBOL DECLARATION FOR TABLE API8.COMPTE                        *
       ******************************************************************
-       01  DCLCLIENT.
+       01  DCLCOMPTE.
+      *                       ID_COMPTE
+           10 WS-ID-COMPTE         PIC S9(9) USAGE COMP.
       *                       ID_CLIENT
-           10 WSID-CLIENT          PIC S9(9) USAGE COMP.
-      *                       NOM_CLIENT
-           10 WSNOM-CLIENT         PIC X(20).
-      *                       PRENOM_CLIENT
-           10 WSPRENOM-CLIENT      PIC X(20).
-      *                       ADRESSE_CLIENT
-           10 WSADRESSE-CLIENT     PIC X(30).
+           10 WS-ID-CLIENT         PIC S9(9) USAGE COMP.
+      *                       CODE_CB
+           10 WS-CODE-CB           PIC S9(9) USAGE COMP.
+      *                       SOLDE
+           10 WS-SOLDE             PIC S9(8)V9(2) USAGE COMP-3.
       ******************************************************************
       * INDICATOR VARIABLE STRUCTURE                                   *
       ******************************************************************
-       01  ICLIENT.
+       01  ICOMPTE.
            10 INDSTRUC           PIC S9(4) USAGE COMP OCCURS 4 TIMES.
       ******************************************************************
       * THE NUMBER OF COLUMNS DESCRIBED BY THIS DECLARATION IS 4       *
