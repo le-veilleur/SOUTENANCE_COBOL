@@ -1,200 +1,232 @@
-# Bancora - Système Bancaire Intégré
+# Bancora - Système Bancaire Intégré Mainframe
 
 ## 📋 Description du Projet
 
-Bancora est un système bancaire complet et intégré, développé en COBOL, incluant à la fois la gestion interne des comptes et clients ainsi que l'interface utilisateur d'un distributeur automatique de billets (DAB). L'objectif est de simuler de manière réaliste le fonctionnement d'une banque moderne, en offrant toutes les fonctionnalités nécessaires pour gérer les opérations financières et les services clients.
+Bancora est un système bancaire complet développé pour environnement **Mainframe z/OS**, utilisant **COBOL**, **JCL** et **ISPF**. Le système simule de manière réaliste le fonctionnement d'une banque moderne en environnement grand système, incluant la gestion des comptes, des clients et un distributeur automatique de billets (DAB).
 
 ## 🏗️ Architecture du Projet
 
 ```
 Projet-cobol/
-├── CPY/                    # Fichiers de copie COBOL
-│   ├── client.txt         # Structure des données client
-│   ├── COMPTE.txt         # Structure des données compte
-│   └── OPE.txt            # Structure des données opération
-├── PROGRAMME/             # Programmes COBOL principaux
-│   └── Client.cbl         # Programme de gestion des clients
-├── sequentiel/            # Fichiers séquentiels
+├── CPY/                    # Copybooks COBOL
+│   ├── client.txt         # Structure données client
+│   ├── COMPTE.txt         # Structure données compte
+│   └── OPE.txt            # Structure données opération
+├── PROGRAMME/             # Programmes COBOL batch
+│   └── Client.cbl         # Programme gestion clients
+├── sequentiel/            # Fichiers séquentiels (datasets)
 │   ├── FCLI.txt           # Fichier clients
 │   └── FCOMPT.txt         # Fichier comptes
-└── sql/                   # Scripts et base de données
-    └── PROJDB.sql         # Script de création de la base de données
+└── sql/                   # Scripts DB2
+    └── PROJDB.sql         # DDL de création des tables
 ```
 
 ## ✨ Fonctionnalités Principales
 
 ### 👥 Gestion des Clients
-- **Création** de nouveaux clients avec informations complètes
-- **Modification** des informations client existantes
-- **Suppression** sécurisée des comptes clients
-- **Consultation** de l'historique client
+- **Création** de nouveaux clients
+- **Modification** des informations client
+- **Suppression** des comptes clients
+- **Consultation** via ISPF
 
 ### 💳 Gestion des Comptes
-- **Ouverture** de nouveaux comptes bancaires
-- **Clôture** des comptes existants
-- **Suivi** des soldes en temps réel
-- **Gestion** multi-comptes par client
+- **Ouverture** de comptes bancaires
+- **Clôture** de comptes
+- **Suivi** des soldes
+- **Gestion** multi-comptes
 
 ### 💰 Opérations Financières
-- **Dépôt** d'argent sur les comptes
-- **Retrait** d'argent depuis les comptes
-- **Virement** entre comptes (interne)
-- **Consultation** de l'historique des transactions
+- **Dépôt** sur comptes
+- **Retrait** depuis comptes
+- **Virement** entre comptes
+- **Historique** des transactions
 
 ### 🏦 Gestion des Crédits
-- **Création** de demandes d'emprunt
+- **Création** d'emprunts
 - **Suivi** des remboursements
-- **Gestion** des échéances de paiement
+- **Gestion** des échéances
 - **Calcul** des intérêts
 
 ### 🏧 Distributeur Automatique de Billets (DAB)
-- **Authentification** sécurisée par carte et code PIN
-- **Consultation** du solde disponible
-- **Retrait** d'argent avec vérification du solde
-- Interface utilisateur intuitive et conviviale
-- **Sécurité** renforcée des transactions
+- **Authentification** par carte et PIN
+- **Consultation** du solde
+- **Retrait** d'argent
+- Interface CICS
 
-### 🗄️ Intégration SQL Complète
-- Gestion de toutes les entités via base de données relationnelle
-- **Persistance** des données garantie
-- **Intégrité référentielle** respectée
-- **Performance** optimisée par indexation
+### 🗄️ Intégration DB2
+- Tables DB2 pour toutes les entités
+- **Curseurs** pour traitement batch
+- **Transactions** COMMIT/ROLLBACK
+- **Intégrité** référentielle
 
-## 🛠️ Technologies Utilisées
+## 🛠️ Technologies Mainframe
 
 | Technologie | Usage |
 |------------|-------|
-| **COBOL** | Langage de programmation principal pour la logique métier |
-| **SQL** | Gestion de la base de données relationnelle |
-| **Fichiers séquentiels** | Stockage alternatif et backup des données |
-| **Architecture modulaire** | Séparation claire des responsabilités |
+| **COBOL** | Langage de programmation des applications batch et online |
+| **DB2** | Système de gestion de base de données relationnelle |
+| **JCL** | Job Control Language pour l'exécution des programmes batch |
+| **ISPF** | Interface utilisateur pour la consultation et saisie |
+| **CICS** | Gestionnaire transactionnel pour le DAB (online) |
+| **VSAM** | Virtual Storage Access Method pour fichiers séquentiels |
 
 ## 📊 Structure des Données
 
-### Clients
-- Numéro client unique
-- Informations personnelles (nom, prénom, adresse)
-- Données de contact (téléphone, email)
-- Date de création du compte
-- Historique des opérations
+### Fichiers VSAM
+- **FCLI** : Fichier clients (Sequenced)
+- **FCOMPT** : Fichier comptes (Sequenced)
+- **Organisation** : Indexed Sequential
 
-### Comptes
-- Numéro de compte unique
-- Type de compte (courant, épargne)
-- Solde actuel
-- Date d'ouverture
-- Lien avec le client propriétaire
-- Historique des transactions
+### Tables DB2
+```sql
+CLIENT (NUM_CLI, NOM, PRENOM, ADRESSE, TELEPHONE)
+COMPTE (NUM_CPT, NUM_CLI, TYPE_CPT, SOLDE, DATE_OUVERTURE)
+OPERATION (ID_OPE, NUM_CPT, TYPE_OPE, MONTANT, DATE_OPE)
+CREDIT (NUM_CREDIT, NUM_CPT, MONTANT, TAUX, ECHEANCES)
+```
 
-### Opérations
-- Identifiant unique
-- Type d'opération (dépôt, retrait, virement)
-- Montant de la transaction
-- Date et heure précises
-- Comptes source et destination (si applicable)
-- Statut de l'opération
+### Copybooks COBOL
+- Structures de données partagées entre programmes
+- Définitions FD pour fichiers séquentiels
+- Structures DCLGEN pour tables DB2
 
 ## 🚀 Installation et Configuration
 
 ### Prérequis
-- Compilateur COBOL (GnuCOBOL, Micro Focus COBOL, etc.)
-- Système de gestion de base de données SQL (MySQL, PostgreSQL, etc.)
-- Accès en lecture/écriture aux répertoires de fichiers
+- Environnement z/OS avec TSO/ISPF
+- Compilateur COBOL Enterprise (version 4.2 ou supérieure)
+- DB2 pour z/OS
+- CICS Transaction Server (pour module DAB)
+- Droits d'accès aux datasets
 
 ### Étapes d'installation
 
-1. **Cloner le projet**
-   ```bash
-   git clone [URL_DU_PROJET]
-   cd Projet-cobol
+1. **Allocation des datasets**
+   ```jcl
+   //ALLOC   EXEC PGM=IEFBR14
+   //FCLI    DD DSN=BANCORA.FCLI,
+   //           DISP=(NEW,CATLG,DELETE),
+   //           SPACE=(CYL,(10,5)),
+   //           DCB=(RECFM=FB,LRECL=200,BLKSIZE=2000)
    ```
 
-2. **Configuration de la base de données**
-   ```bash
-   # Créer la base de données
-   mysql -u root -p < sql/PROJDB.sql
+2. **Création des tables DB2**
+   - Se connecter à DB2 via SPUFI ou QMF
+   - Exécuter le script `PROJDB.sql`
+   - Vérifier les BIND pour les plans
+
+3. **Compilation des programmes**
+   ```jcl
+   //COMPILE EXEC PROC=IGYWCL,
+   //        PARM.COBOL='LIB,APOST,NODYNAM'
+   //COBOL.SYSIN DD DSN=BANCORA.SOURCE(CLIENT),DISP=SHR
+   //COBOL.SYSLIB DD DSN=BANCORA.CPY,DISP=SHR
    ```
 
-3. **Configuration des chemins**
-   - Modifier les chemins des fichiers dans les programmes COBOL
-   - Adapter les paramètres de connexion SQL
+4. **Configuration ISPF**
+   - Définir les panels ISPF
+   - Configurer les tables de commandes
+   - Associer les programmes aux transactions
 
-4. **Compilation**
-   ```bash
-   cobc -x PROGRAMME/Client.cbl -o bancora
-   ```
+5. **Configuration CICS**
+   - Définir les transactions CICS (ex: BDAB pour DAB)
+   - Installer les programmes en région CICS
+   - Configurer les fichiers VSAM
 
-5. **Exécution**
-   ```bash
-   ./bancora
-   ```
+## 📝 Exemples JCL
 
-## 🔒 Sécurité
+### Exécution Programme Batch
+```jcl
+//BANCORA JOB (ACCT),'GESTION CLIENT',
+//        CLASS=A,MSGCLASS=X,NOTIFY=&SYSUID
+//STEP1   EXEC PGM=CLIENT,REGION=4M
+//STEPLIB DD DSN=BANCORA.LOADLIB,DISP=SHR
+//FCLI    DD DSN=BANCORA.FCLI,DISP=SHR
+//FCOMPT  DD DSN=BANCORA.FCOMPT,DISP=SHR
+//SYSOUT  DD SYSOUT=*
+//SYSPRINT DD SYSOUT=*
+```
 
-- **Authentification** : Système de login sécurisé avec codes PIN
-- **Chiffrement** : Protection des données sensibles
-- **Audit** : Traçabilité complète de toutes les opérations
-- **Validation** : Contrôles stricts sur toutes les transactions
-- **Journalisation** : Historique complet des accès et modifications
+### Traitement DB2
+```jcl
+//DB2JOB  JOB (ACCT),'DB2 UPDATE',
+//        CLASS=A,MSGCLASS=X
+//STEP1   EXEC DSNUPROC,SYSTEM=DB2P,UID='BANCORA',
+//        UTPROC=''
+//DSNUPROC.SYSIN DD *
+  UPDATE BANCORA.COMPTE
+  SET SOLDE = SOLDE + 1000
+  WHERE NUM_CPT = '12345678'
+/*
+```
+
+## 🔒 Sécurité Mainframe
+
+- **RACF** : Contrôle d'accès aux ressources
+- **Encryption** : Protection des données sensibles via ICSF
+- **Audit SMF** : Traçabilité via SMF (System Management Facility)
+- **CICS Security** : Transaction-level security
+- **DB2 Grants** : Autorisations au niveau table
 
 ## 📈 Performances
 
-- Optimisation des requêtes SQL avec indexation appropriée
-- Gestion efficace de la mémoire
-- Traitement rapide des transactions
-- Architecture scalable pour charge croissante
+- **Buffering** : Optimisation via buffer pools DB2
+- **Indexation** : Index sur clés primaires et étrangères
+- **Batch Window** : Traitements nocturnes optimisés
+- **VSAM Tuning** : CI/CA sizing approprié
+- **COBOL Optimization** : OPTIMIZE(FULL) en compilation
 
 ## 🎯 Objectifs du Projet
 
-1. Simuler un environnement bancaire réaliste et fonctionnel
-2. Démontrer les capacités du langage COBOL dans un contexte moderne
-3. Intégrer harmonieusement COBOL et SQL
-4. Fournir une expérience utilisateur complète et professionnelle
-5. Servir de référence pour l'apprentissage du développement bancaire
+1. Démontrer les capacités COBOL en environnement mainframe
+2. Intégrer COBOL/DB2 de manière professionnelle
+3. Simuler un système bancaire production-ready
+4. Maîtriser JCL et ISPF pour applications complexes
+5. Comprendre l'architecture des grands systèmes bancaires
 
 ## 🔮 Évolutions Futures
 
-- [ ] Interface web moderne (HTML/CSS/JavaScript)
-- [ ] Application mobile (iOS/Android)
-- [ ] API RESTful pour intégrations tierces
-- [ ] Intégration avec systèmes de paiement externes
-- [ ] Module d'analytics et reporting avancés
-- [ ] Système de notifications (SMS/Email)
-- [ ] Support multi-devises
-- [ ] Module de gestion des cartes bancaires
+- [ ] Module de reporting batch (COBOL/SORT)
+- [ ] Interface REXX pour automatisation
+- [ ] Intégration MQ Series pour messaging
+- [ ] Module de sauvegarde/restauration
+- [ ] Dashboard ISPF avec statistiques
+- [ ] Export vers fichiers XML/JSON
+- [ ] Module d'archivage HSM
+- [ ] Intégration z/OS Connect pour API REST
 
 ## 📝 Utilisation
 
-### Menu Principal
+### Accès via ISPF
 ```
-========================================
-    BANCORA - SYSTÈME BANCAIRE
-========================================
-1. Gestion des clients
-2. Gestion des comptes
-3. Opérations financières
-4. Gestion des crédits
-5. Accès DAB
-6. Quitter
-========================================
+Menu Principal BANCORA
+---------------------------------
+Option ===>
+
+1  - Gestion des clients
+2  - Gestion des comptes  
+3  - Opérations financières
+4  - Gestion des crédits
+5  - Administration
+X  - Exit
 ```
 
-## 🤝 Contribution
-
-Les contributions sont les bienvenues ! N'hésitez pas à :
-- Signaler des bugs
-- Proposer de nouvelles fonctionnalités
-- Améliorer la documentation
-- Soumettre des pull requests
+### Transaction CICS DAB
+```
+BDAB - Distributeur Automatique
+---------------------------------
+Entrez votre numéro de carte:
+Entrez votre code PIN:
+```
 
 ## 📄 Licence
 
-Ce projet est développé dans le cadre de l'apprentissage du langage COBOL et de l'intégration avec les bases de données relationnelles.
+Projet développé dans le cadre de l'apprentissage des technologies mainframe (COBOL, JCL, DB2, ISPF, CICS).
 
 ## 👨‍💻 Auteur
 
-[Votre nom]
-
+[le-veilleur] - Développeur Mainframe
+[https://github.com/ALP436] - Développeur Mainframe
 ---
 
-**Bancora** - *Votre partenaire bancaire en COBOL* 🏦
+**Bancora** - *Système bancaire pour z/OS Mainframe* 🏦💻
