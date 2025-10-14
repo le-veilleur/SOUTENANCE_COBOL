@@ -28,7 +28,6 @@
 
        01  WS-COMMAREA.
            05 WS-COM-ID-CLIENT PIC X(10).
-           05 WS-COM-CODE-CB PIC X(4).
 
 
        PROCEDURE DIVISION.
