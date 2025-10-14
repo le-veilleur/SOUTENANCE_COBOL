@@ -8,7 +8,7 @@ APNSE01  DFHMSD TYPE=&SYSPARM,                                         *
                TIOAPFX=YES,                                            *
                MAPATTS=(COLOR,HILIGHT,OUTLINE,PS,SOSI),                *
                DSATTS=(COLOR,HILIGHT,OUTLINE,PS,SOSI)
-MAP1     DFHMDI SIZE=(24,80),                                          *
+ACU1     DFHMDI SIZE=(24,80),                                          *
                COLUMN=1,                                               *
                LINE=1
  DFHMDF                         POS=(2,7),LENGTH=66,                   *
@@ -46,7 +46,7 @@ MAP1     DFHMDI SIZE=(24,80),                                          *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
 PASSCB DFHMDF       POS=(9,39),LENGTH=4,                               *
-               ATTRB=(UNPROT,IC,DRK),                                  *
+               ATTRB=(UNPROT,IC,NORM),                                 *
                HILIGHT=UNDERLINE,                                      *
                COLOR=GREEN
  DFHMDF                         POS=(9,44),LENGTH=0,                   *
@@ -74,7 +74,7 @@ IDCLIENT DFHMDF POS=(10,39),LENGTH=10,                                 *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
 RETDEP DFHMDF       POS=(15,43),LENGTH=1,                              *
-               ATTRB=(UNPROT,DRK),                                     *
+               ATTRB=(UNPROT,NORM),                                    *
                HILIGHT=UNDERLINE,                                      *
                COLOR=GREEN
  DFHMDF                         POS=(15,45),LENGTH=0,                  *
@@ -96,5 +96,5 @@ MESDEPRET DFHMDF POS=(20,5),LENGTH=70,                                 *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=BLUE
-AP3SE03  DFHMSD TYPE=FINAL
+APNSE01  DFHMSD TYPE=FINAL
          END
