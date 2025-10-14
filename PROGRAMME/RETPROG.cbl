@@ -52,6 +52,7 @@
        1000-AFFICHER-ECRAN.
            EXEC CICS SEND MAP ('RETU1')
                 MAPSET ('APNSE02')
+                ERASE
            END-EXEC.
 
            IF EIBAID = DFHPF3

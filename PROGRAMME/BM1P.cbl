@@ -37,7 +37,7 @@
                 SET CURRENT SQLID='API3'
            END-EXEC.
 
-           IF EIBCALEN = 0
+           IF EIBCALEN = ZERO
               PERFORM 1000-ECRAN-ACCUEIL
                  THRU 1000-ECRAN-ACCUEIL-EXIT
            ELSE
@@ -58,7 +58,7 @@
            END-EXEC.
 
            EXEC CICS RETURN
-                TRANSID('SN01')
+                TRANSID('SN31')
                 COMMAREA(WS-COMMAREA)
            END-EXEC.
 
@@ -94,7 +94,7 @@
                           ERASE
               END-EXEC
               EXEC CICS RETURN
-                  TRANSID('SN01')
+                  TRANSID('SN31')
                   COMMAREA(WS-COMMAREA)
               END-EXEC
            END-IF.
@@ -112,6 +112,16 @@
                  END-EXEC
               WHEN OTHER
                  MOVE 'CHOIX INVALIDE' TO MESDEPRETO
+
+                 EXEC CICS SEND MAP ('ACU1')
+                           MAPSET('APNSE01')
+                           ERASE
+                 END-EXEC
+
+                 EXEC CICS RETURN
+                           TRANSID('SN31')
+                           COMMAREA(WS-COMMAREA)
+                 END-EXEC
            END-EVALUATE.
 
        2000-TRAITER-REPONSE-EXIT.
