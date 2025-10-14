@@ -51,6 +51,8 @@
 
 
        1000-ECRAN-ACCUEIL.
+           MOVE LOW-VALUES TO ACU1I
+           MOVE LOW-VALUES TO ACU1O
 
            EXEC CICS SEND MAP ('ACU1')
                           MAPSET ('APNSE01')

@@ -50,17 +50,18 @@
            EXIT.
 
        1000-AFFICHER-ECRAN.
+           MOVE LOW-VALUES TO RETU1I
+           MOVE LOW-VALUES TO RETU1O
            EXEC CICS SEND MAP ('RETU1')
                 MAPSET ('APNSE02')
                 ERASE
            END-EXEC.
+           
 
-           IF EIBAID = DFHPF3
-              EXEC CICS RETURN
-              END-EXEC
-           END-IF.
-
-
+           EXEC CICS RETURN 
+                  TRANSID('SN32')
+                  COMMAREA(WS-COMMAREA)
+           END-EXEC.
 
        1000-AFFICHER-ECRAN-EXIT.
            EXIT.
