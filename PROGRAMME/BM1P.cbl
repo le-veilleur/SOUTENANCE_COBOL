@@ -90,6 +90,12 @@
            END-EXEC.
 
            IF WS-CARD-EXISTANT = 0
+              MOVE LOW-VALUES TO ACU1I
+              MOVE LOW-VALUES TO ACU1O
+
+              MOVE SPACES TO MESCBO
+              MOVE SPACES TO MESDEPRETO
+            
               MOVE 'CARTE OU CLIENT NON EXISTANT' TO MESCBO
               EXEC CICS SEND MAP ('ACU1')
                           MAPSET ('APNSE01')
