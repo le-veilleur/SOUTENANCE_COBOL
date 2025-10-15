@@ -95,7 +95,7 @@
 
               MOVE SPACES TO MESCBO
               MOVE SPACES TO MESDEPRETO
-              
+            
               MOVE 'CARTE OU CLIENT NON EXISTANT' TO MESCBO
               EXEC CICS SEND MAP ('ACU1')
                           MAPSET ('APNSE01')
@@ -134,4 +134,3 @@
 
        2000-TRAITER-REPONSE-EXIT.
            EXIT.
-
