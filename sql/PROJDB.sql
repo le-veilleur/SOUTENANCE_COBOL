@@ -58,7 +58,7 @@ COMMENT ON COMPTE (
 
 COMMIT;
 ------------------------------------------------------------
--- 3. TABLE OPERATION
+-- 3. TABLE OPERATION FICHIER DCLGEN OPE
 ------------------------------------------------------------
 CREATE TABLE OPERATION (
     ID_OPERATION INTEGER NOT NULL,
