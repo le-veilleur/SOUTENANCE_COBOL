@@ -1,0 +1,101 @@
+APNSE05  DFHMSD TYPE=&SYSPARM,                                         *
+               MODE=INOUT,                                             *
+               LANG=COBOL,                                             *
+               STORAGE=AUTO,                                           *
+               CTRL=FREEKB,                                            *
+               EXTATT=YES,                                             *
+               TERM=3270-2,                                            *
+               TIOAPFX=YES,                                            *
+               MAPATTS=(COLOR,HILIGHT,OUTLINE,PS,SOSI),                *
+               DSATTS=(COLOR,HILIGHT,OUTLINE,PS,SOSI)
+LIST     DFHMDI SIZE=(24,80),                                          *
+               COLUMN=1,                                               *
+               LINE=NEXT
+ DFHMDF                         POS=(3,10),LENGTH=61,                  *
+               INITIAL='************************************************
+               **************',                                        *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(4,10),LENGTH=61,                  *
+               INITIAL='*********************  MENU COMPTE   ***********
+               **************',                                        *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(5,10),LENGTH=61,                  *
+               INITIAL='************************************************
+               *************',                                         *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(7,20),LENGTH=19,                  *
+               INITIAL='Compte Client de : ',                          *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+NCPTE DFHMDF          POS=(7,44),LENGTH=15,                            *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=GREEN
+ DFHMDF                         POS=(10,10),LENGTH=12,                 *
+               INITIAL='ID Operation ',                                *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(10,24),LENGTH=10,                 *
+               INITIAL='ID compte',                                    *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(10,36),LENGTH=10,                 *
+               INITIAL='Montant OP',                                   *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(10,49),LENGTH=8,                  *
+               INITIAL='TYPE OP',                                      *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(10,59),LENGTH=8,                  *
+               INITIAL='date op',                                      *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(11,10),LENGTH=57,                 *
+               INITIAL='-----------------------------------------------*
+               -----------',                                           *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+* 
+OPELIST DFHMDF    POS=(12,1),LENGTH=79,                                *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=GREEN,                                            *
+               OCCURS=10
+ DFHMDF                         POS=(22,4),LENGTH=10,                  *
+               INITIAL='Page : ',                                      *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+PAGE DFHMDF             POS=(22,16),LENGTH=3,                          *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=GREEN
+ DFHMDF                         POS=(22,20),LENGTH=10,                 *
+               INITIAL='Total : ',                                     *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+TOTAL DFHMDF          POS=(22,32),LENGTH=5,                            *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=GREEN
+MESSAGE DFHMDF    POS=(23,4),LENGTH=60,                                *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=RED
+APNSE05  DFHMSD TYPE=FINAL
+         END

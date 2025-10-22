@@ -82,13 +82,15 @@
                  PERFORM 1400-SEND-ACCUEIL-MAP
            END-EVALUATE.
 
-           MOVE DFHCOM-ID-CLIENT TO WS-COMMUNICATION-AREA.
-
-           EXEC CICS
-              RETURN TRANSID('SN01')
-                     COMMAREA(WS-COMMUNICATION-AREA)
-                     LENGTH(10)
-           END-EXEC.
+      * Seulement si on n'a pas fait de XCTL
+           IF NOT VALID-DATA
+              MOVE DFHCOM-ID-CLIENT TO WS-COMMUNICATION-AREA
+              EXEC CICS
+                 RETURN TRANSID('SN01')
+                        COMMAREA(WS-COMMUNICATION-AREA)
+                        LENGTH(10)
+              END-EXEC
+           END-IF.
 
 
 
@@ -113,12 +115,18 @@
               MOVE 'N' TO VALID-DATA-SW
               MOVE 'Champs numériques uniquement    ' TO MESDEPRETO
            END-IF.
-
-           IF RETDEPI NOT = 'D' AND RETDEPI NOT = 'R'
-              MOVE 'N' TO VALID-DATA-SW
-              MOVE 'RETRAIT DEPOT INCORECT    ' TO MESDEPRETO
-           END-IF.
-
+           
+           EVALUATE RETDEPI
+              WHEN 'D'
+              WHEN 'R'
+              WHEN 'V'
+              WHEN 'L'
+                 CONTINUE
+              WHEN OTHER
+                 MOVE 'N' TO VALID-DATA-SW
+                 MOVE 'OPERATION INCORRECTE (D/R/V/L)    ' TO MESDEPRETO
+           END-EVALUATE.
+          
 
 
        1300-GET-CLIENT.
@@ -186,6 +194,12 @@
 
               WHEN 'D'
                  EXEC CICS XCTL PROGRAM('API8DEPO')
+                      COMMAREA(WS-COMMUNICATION-AREA)
+                      LENGTH(LENGTH OF WS-COMMUNICATION-AREA)
+                 END-EXEC
+              
+              WHEN 'L'
+                 EXEC CICS XCTL PROGRAM('API8LIST')
                       COMMAREA(WS-COMMUNICATION-AREA)
                       LENGTH(LENGTH OF WS-COMMUNICATION-AREA)
                  END-EXEC

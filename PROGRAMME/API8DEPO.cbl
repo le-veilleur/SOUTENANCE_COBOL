@@ -101,15 +101,15 @@
            
            END-EVALUATE.
 
-           IF XCTL-PROGRAM            
-               EXEC CICS XCTL PROGRAM('API8BM1P')
-                    COMMAREA(WS-COMMUNICATION-AREA)
-                    LENGTH(LENGTH OF WS-COMMUNICATION-AREA)
-               END-EXEC
-           ELSE
+           IF NOT XCTL-PROGRAM            
                EXEC CICS RETURN TRANSID('SN03')
                     COMMAREA(WS-COMMUNICATION-AREA)
                     LENGTH(10)
+               END-EXEC
+           ELSE
+               EXEC CICS XCTL PROGRAM('API8BM1P')
+                    COMMAREA(WS-COMMUNICATION-AREA)
+                    LENGTH(LENGTH OF WS-COMMUNICATION-AREA)
                END-EXEC
            END-IF.
 
