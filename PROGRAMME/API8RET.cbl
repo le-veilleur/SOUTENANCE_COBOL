@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. API3RET.
+       PROGRAM-ID. API8RET.
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
        DATA DIVISION.
@@ -99,13 +99,13 @@
 
            IF NOT XCTL-PROGRAM
               EXEC CICS
-                   RETURN TRANSID('SN32')
+                   RETURN TRANSID('SN02')
                    COMMAREA(WS-COMMUNICATION-AREA)
                    LENGTH(10)
               END-EXEC
            ELSE
               EXEC CICS
-                   XCTL PROGRAM('API3BM1P')
+                   XCTL PROGRAM('API8BM1P')
                    COMMAREA(WS-COMMUNICATION-AREA)
                    LENGTH(LENGTH OF WS-COMMUNICATION-AREA)
               END-EXEC
@@ -132,7 +132,7 @@
            EXEC SQL
               SELECT PRENOM_CLIENT
               INTO :WS-PRENOM-CLIENT
-              FROM API3.CLIENT
+              FROM API8.CLIENT
               WHERE ID_CLIENT = :WS-COMMUNICATION-AREA
            END-EXEC
            IF SQLCODE = 0
@@ -141,7 +141,7 @@
               EXEC SQL
                  SELECT SOLDE
                  INTO :WS-SOLDE
-                 FROM API3.COMPTE
+                 FROM API8.COMPTE
                  WHERE ID_CLIENT = :WS-COMMUNICATION-AREA
               END-EXEC
               IF SQLCODE = 0
@@ -569,7 +569,7 @@
            EXEC SQL
               SELECT SOLDE
               INTO :WS-SOLDE
-              FROM API3.COMPTE
+              FROM API8.COMPTE
               WHERE ID_CLIENT = :WS-COMMUNICATION-AREA
            END-EXEC.
 
@@ -597,19 +597,20 @@
 
        1500-UPDATE-SOLDE.
            EXEC SQL
-              UPDATE API3.COMPTE
-                 SET SOLDE = SOLDE - :WS-MONTANT-RETRAIT
-                 WHERE ID_CLIENT = :WS-COMMUNICATION-AREA
+              UPDATE API8.COMPTE
+              SET SOLDE = SOLDE - :WS-MONTANT-RETRAIT
+              WHERE ID_CLIENT = :WS-COMMUNICATION-AREA
            END-EXEC.
 
            IF SQLCODE = 0
       *       Update réussi - enregistrer l'operation
               PERFORM 1600-INSERT-OPERATION
+      
       *       Lire le nouveau solde pour affichage
               EXEC SQL
                  SELECT SOLDE
                  INTO :WS-SOLDE
-                 FROM API3.COMPTE
+                 FROM API8.COMPTE
                  WHERE ID_CLIENT = :WS-COMMUNICATION-AREA
               END-EXEC
               IF SQLCODE = 0
@@ -652,7 +653,7 @@
            EXEC SQL
               SELECT ID_COMPTE
               INTO :DCLOPERATION.WS-ID-COMPTE
-              FROM API3.COMPTE
+              FROM API8.COMPTE
               WHERE ID_CLIENT = :WS-COMMUNICATION-AREA
            END-EXEC.
 
@@ -661,7 +662,7 @@
               EXEC SQL
                  SELECT MAX(ID_OPERATION)
                  INTO :DCLOPERATION.WS-ID-OPERATION :WS-NULL-INDICATOR
-                 FROM API3.OPERATION
+                 FROM API8.OPERATION
               END-EXEC
 
       *       Gerer le cas table vide ou valeur NULL
@@ -677,12 +678,10 @@
               MOVE WS-MONTANT-RETRAIT TO 
                    WS-MONTANT-OP OF DCLOPERATION
               MOVE 'R' TO WS-TYPE-OP OF DCLOPERATION
-      *       Recuperer la date du jour au format YYYYMMDD
-              ACCEPT WS-DATE-OP OF DCLOPERATION FROM DATE YYYYMMDD
 
       *       Inserer l'operation dans la table OPERATION
               EXEC SQL
-                 INSERT INTO API3.OPERATION
+                 INSERT INTO API8.OPERATION
                     (ID_OPERATION, ID_COMPTE, MONTANT_OP,
                      TYPE_OP, DATE_OP)
                  VALUES
@@ -690,7 +689,14 @@
                      :DCLOPERATION.WS-ID-COMPTE,
                      :DCLOPERATION.WS-MONTANT-OP,
                      :DCLOPERATION.WS-TYPE-OP,
-                     :DCLOPERATION.WS-DATE-OP)
+                     CURRENT DATE)
               END-EXEC
+
+      *       Verifier si l'insertion a reussi
+              IF SQLCODE NOT = 0
+                 MOVE 'ERREUR ENREGISTREMENT OPERATION' TO MESRETO
+              END-IF
+           ELSE
+              MOVE 'ERREUR COMPTE INTROUVABLE' TO MESRETO
            END-IF.
            

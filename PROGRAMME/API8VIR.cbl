@@ -7,7 +7,6 @@
 
        WORKING-STORAGE SECTION.
 
-           COPY DFHAID.
 
            EXEC SQL
               INCLUDE SQLCA
@@ -25,6 +24,7 @@
               INCLUDE OPE
            END-EXEC.
 
+           COPY DFHAID.
            COPY APNSE04.
 
        01  WS-TEMP-ID-BENEF-ALPHA  PIC X(10).
@@ -68,7 +68,7 @@
            END-IF.
 
            EVALUATE TRUE
-               WHEN EIBCALEN = ZERO OR 4 
+               WHEN EIBCALEN = 4 
                   MOVE LOW-VALUES TO VIRU1I
                   MOVE LOW-VALUES TO VIRU1O
                   PERFORM 1150-GET-CLIENT-PRENOM
@@ -102,7 +102,7 @@
               EXEC CICS
                    RETURN TRANSID('SN04')
                    COMMAREA(WS-COMMUNICATION-AREA)
-                   LENGTH(LENGTH OF WS-COMMUNICATION-AREA)
+                   LENGTH(10)
               END-EXEC
            ELSE
               EXEC CICS
@@ -115,6 +115,9 @@
        1000-PROCESS-INPUT.
            PERFORM 1100-RECEIVE-VIREMENT-MAP.
            PERFORM 1200-EDIT-VIREMENT-DATA.
+           IF VALID-DATA
+              PERFORM 1250-CONVERT-MONTANT
+           END-IF.
            IF VALID-DATA
               PERFORM 1500-VERIF-SOLDE
               IF VALID-DATA
@@ -140,7 +143,7 @@
            EXEC SQL
               SELECT PRENOM_CLIENT
               INTO :WS-PRENOM-CLIENT
-              FROM API3.CLIENT
+              FROM API8.CLIENT
               WHERE ID_CLIENT = :DCLCLIENT.WS-ID-CLIENT
            END-EXEC
            IF SQLCODE = 0
@@ -150,23 +153,37 @@
            END-IF.
 
        1200-EDIT-VIREMENT-DATA.
-           IF NOT INPUTDEP1I NUMERIC OR INPUTVIRI IS NOT NUMERIC
+           MOVE 'Y' TO VALID-DATA-SW
+           IF INPUTDEP1I = SPACES OR INPUTVIRI = SPACES
               MOVE 'N' TO VALID-DATA-SW
-              MOVE 'CHAMPS NUMERIQUES SEULEMENT' TO MESVIRO
+              MOVE 'CHAMPS OBLIGATOIRES' TO MESVIRO
               PERFORM 1290-CLEAR-ALL-FIELDS
+           ELSE
+              IF NOT INPUTDEP1I NUMERIC OR INPUTVIRI IS NOT NUMERIC
+                 MOVE 'N' TO VALID-DATA-SW
+                 MOVE 'CHAMPS NUMERIQUES SEULEMENT' TO MESVIRO
+                 PERFORM 1290-CLEAR-ALL-FIELDS
+              END-IF
            END-IF.
 
-       1300-PROCESS-VIREMENT.
+       1250-CONVERT-MONTANT.
+      *    Convertir les données saisies
            MOVE INPUTDEP1I TO WS-TEMP-ID-BENEF-ALPHA.
            MOVE WS-TEMP-ID-BENEF-ALPHA TO WS-TEMP-ID-BENEF-NUM.
            MOVE WS-TEMP-ID-BENEF-NUM TO WS-ID-BENEF.
            
-           MOVE INPUTVIRI TO WS-MONTANT-VIREMENT-ALPHA.
-           MOVE WS-MONTANT-VIREMENT-ALPHA TO WS-MONTANT-VIREMENT-NUM.
+      *    Convertir le montant directement (sans passer par X(10))
+      *    INPUTVIRI (PIC X(4)) -> WS-MONTANT-VIREMENT-NUM (PIC 9(10))
+      *    COBOL converti automatiquement "0025" en 25
+           MOVE INPUTVIRI TO WS-MONTANT-VIREMENT-NUM.
+           
+      *    Puis conversion en COMP-3 avec décimales
            MOVE WS-MONTANT-VIREMENT-NUM TO WS-MONTANT-VIREMENT.
-          
+
+       1300-PROCESS-VIREMENT.
+      *    Les conversions ont déjà été faites dans 1250-CONVERT-MONTANT
            EXEC SQL
-            UPDATE API3.COMPTE
+            UPDATE API8.COMPTE
             SET SOLDE = SOLDE - :WS-MONTANT-VIREMENT
             WHERE ID_CLIENT = :DCLCOMPTE.WS-ID-CLIENT
            END-EXEC.
@@ -174,7 +191,7 @@
            EVALUATE SQLCODE
               WHEN 0
                     EXEC SQL
-                    UPDATE API3.COMPTE
+                    UPDATE API8.COMPTE
                     SET SOLDE = SOLDE + :WS-MONTANT-VIREMENT
                     WHERE ID_CLIENT = :WS-ID-BENEF
                     END-EXEC
@@ -239,29 +256,35 @@
            MOVE DFHCOM-ID-CLIENT TO WS-ID-CLIENT OF DCLCOMPTE.
            EXEC SQL
               SELECT SOLDE
-              INTO :WS-SOLDE
+              INTO :DCLCOMPTE.WS-SOLDE
               FROM API8.COMPTE
               WHERE ID_CLIENT = :DCLCOMPTE.WS-ID-CLIENT
            END-EXEC.
 
-              EVALUATE SQLCODE
-                 WHEN 0
-                  IF WS-SOLDE < WS-MONTANT-VIREMENT
-                      MOVE 'N' TO VALID-DATA-SW
-                      MOVE 'SOLDE INSUFFISANT POUR VIREMENT' TO MESVIRO
-                      PERFORM 1290-CLEAR-ALL-FIELDS
-                  ELSE 
-                     CONTINUE
-                  END-IF
-                 WHEN 100 
+           EVALUATE SQLCODE
+              WHEN 0
+                 IF WS-MONTANT-VIREMENT <= ZERO
                     MOVE 'N' TO VALID-DATA-SW
-                    MOVE 'COMPTE INEXISTANT' TO MESVIRO
+                    MOVE 'MONTANT DOIT ETRE SUPERIEUR A ZERO' TO MESVIRO
                     PERFORM 1290-CLEAR-ALL-FIELDS
-                 WHEN OTHER
-                    MOVE 'ERREUR BDD' TO MESVIRO
-                    MOVE 'N' TO VALID-DATA-SW
-                    PERFORM 1290-CLEAR-ALL-FIELDS
-              END-EVALUATE.
+                 ELSE
+                    IF WS-SOLDE OF DCLCOMPTE < WS-MONTANT-VIREMENT
+                       MOVE 'N' TO VALID-DATA-SW
+                       MOVE 'SOLDE INSUFFISANT POUR VIREMENT' TO MESVIRO
+                       PERFORM 1290-CLEAR-ALL-FIELDS
+                    ELSE
+                       CONTINUE
+                    END-IF
+                 END-IF
+              WHEN 100
+                 MOVE 'N' TO VALID-DATA-SW
+                 MOVE 'COMPTE INEXISTANT' TO MESVIRO
+                 PERFORM 1290-CLEAR-ALL-FIELDS
+              WHEN OTHER
+                 MOVE 'ERREUR BDD' TO MESVIRO
+                 MOVE 'N' TO VALID-DATA-SW
+                 PERFORM 1290-CLEAR-ALL-FIELDS
+           END-EVALUATE.
     
 
        1600-INSERT-OPERATION.

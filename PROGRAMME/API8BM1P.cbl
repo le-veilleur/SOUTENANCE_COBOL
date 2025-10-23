@@ -203,4 +203,10 @@
                       COMMAREA(WS-COMMUNICATION-AREA)
                       LENGTH(LENGTH OF WS-COMMUNICATION-AREA)
                  END-EXEC
+
+              WHEN 'V'
+                 EXEC CICS XCTL PROGRAM('API8VIR')
+                      COMMAREA(WS-COMMUNICATION-AREA)
+                      LENGTH(LENGTH OF WS-COMMUNICATION-AREA)
+                 END-EXEC
            END-EVALUATE.

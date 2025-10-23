@@ -11,6 +11,48 @@ APNSE02  DFHMSD TYPE=&SYSPARM,                                         *
 RETU1    DFHMDI SIZE=(24,80),                                          *
                COLUMN=1,                                               *
                LINE=1
+MT10 DFHMDF             POS=(11,31),LENGTH=1,                          *
+               ATTRB=(UNPROT,IC,NORM),                                 *
+               HILIGHT=UNDERLINE,                                      *
+               COLOR=GREEN
+ DFHMDF                         POS=(11,34),LENGTH=0,                  *
+               ATTRB=ASKIP
+MT50 DFHMDF             POS=(11,63),LENGTH=1,                          *
+               ATTRB=(UNPROT,NORM),                                    *
+               HILIGHT=UNDERLINE,                                      *
+               COLOR=GREEN
+ DFHMDF                         POS=(11,66),LENGTH=0,                  *
+               ATTRB=ASKIP
+MT20 DFHMDF             POS=(13,31),LENGTH=1,                          *
+               ATTRB=(UNPROT,NORM),                                    *
+               HILIGHT=UNDERLINE,                                      *
+               COLOR=GREEN
+ DFHMDF                         POS=(13,34),LENGTH=0,                  *
+               ATTRB=ASKIP
+MT60 DFHMDF             POS=(13,63),LENGTH=1,                          *
+               ATTRB=(UNPROT,NORM),                                    *
+               HILIGHT=UNDERLINE,                                      *
+               COLOR=GREEN
+ DFHMDF                         POS=(13,66),LENGTH=0,                  *
+               ATTRB=ASKIP
+MT30 DFHMDF             POS=(15,31),LENGTH=1,                          *
+               ATTRB=(UNPROT,NORM),                                    *
+               HILIGHT=UNDERLINE,                                      *
+               COLOR=GREEN
+ DFHMDF                         POS=(15,34),LENGTH=0,                  *
+               ATTRB=ASKIP
+MT70 DFHMDF             POS=(15,63),LENGTH=1,                          *
+               ATTRB=(UNPROT,NORM),                                    *
+               HILIGHT=UNDERLINE,                                      *
+               COLOR=GREEN
+ DFHMDF                         POS=(15,66),LENGTH=0,                  *
+               ATTRB=ASKIP
+MT40 DFHMDF             POS=(17,31),LENGTH=1,                          *
+               ATTRB=(UNPROT,NORM),                                    *
+               HILIGHT=UNDERLINE,                                      *
+               COLOR=GREEN
+ DFHMDF                         POS=(17,34),LENGTH=0,                  *
+               ATTRB=ASKIP
  DFHMDF                         POS=(2,7),LENGTH=66,                   *
                INITIAL='************************************************
                *******************',                                   *
@@ -35,14 +77,14 @@ RETU1    DFHMDI SIZE=(24,80),                                          *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
 NCPTE DFHMDF          POS=(5,43),LENGTH=15,                            *
-               ATTRB=(UNPROT,NORM),                                    *
+               ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=GREEN
  DFHMDF                         POS=(5,59),LENGTH=0,                   *
                ATTRB=ASKIP
  DFHMDF                         POS=(7,3),LENGTH=74,                   *
                INITIAL='Veuillez choisir un montant de retrait parmi le*
-               s choix ci-dessous (Y/N) :',                            *
+               s choix ci-dessous (Y) :',                              *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
@@ -52,83 +94,41 @@ NCPTE DFHMDF          POS=(5,43),LENGTH=15,                            *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
- DFHMDF                         POS=(11,21),LENGTH=6,                  *
-               INITIAL='10 €  ',                                       *
+ DFHMDF                         POS=(11,21),LENGTH=7,                  *
+               INITIAL='10 EUR',                                       *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
-MT10 DFHMDF             POS=(11,29),LENGTH=1,                          *
-               ATTRB=(UNPROT,IC,NORM),                                 *
-               HILIGHT=UNDERLINE,                                      *
-               COLOR=GREEN
- DFHMDF                         POS=(11,31),LENGTH=0,                  *
-               ATTRB=ASKIP
- DFHMDF                         POS=(11,53),LENGTH=6,                  *
-               INITIAL='50 €  ',                                       *
+ DFHMDF                         POS=(11,53),LENGTH=8,                  *
+               INITIAL='50 EUR  ',                                     *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
-MT50 DFHMDF             POS=(11,61),LENGTH=1,                          *
-               ATTRB=(UNPROT,NORM),                                    *
-               HILIGHT=UNDERLINE,                                      *
-               COLOR=GREEN
- DFHMDF                         POS=(11,63),LENGTH=0,                  *
-               ATTRB=ASKIP
- DFHMDF                         POS=(13,21),LENGTH=6,                  *
-               INITIAL='20 €  ',                                       *
+ DFHMDF                         POS=(13,21),LENGTH=7,                  *
+               INITIAL='20 EUR ',                                      *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
-MT20 DFHMDF             POS=(13,29),LENGTH=1,                          *
-               ATTRB=(UNPROT,NORM),                                    *
-               HILIGHT=UNDERLINE,                                      *
-               COLOR=GREEN
- DFHMDF                         POS=(13,31),LENGTH=0,                  *
-               ATTRB=ASKIP
- DFHMDF                         POS=(13,53),LENGTH=6,                  *
-               INITIAL='60 €  ',                                       *
+ DFHMDF                         POS=(13,53),LENGTH=8,                  *
+               INITIAL='60 EUR',                                       *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
-MT60 DFHMDF             POS=(13,61),LENGTH=1,                          *
-               ATTRB=(UNPROT,NORM),                                    *
-               HILIGHT=UNDERLINE,                                      *
-               COLOR=GREEN
- DFHMDF                         POS=(13,63),LENGTH=0,                  *
-               ATTRB=ASKIP
- DFHMDF                         POS=(15,21),LENGTH=6,                  *
-               INITIAL='30 €  ',                                       *
+ DFHMDF                         POS=(15,21),LENGTH=8,                  *
+               INITIAL='30 EUR  ',                                     *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
-MT30 DFHMDF             POS=(15,29),LENGTH=1,                          *
-               ATTRB=(UNPROT,NORM),                                    *
-               HILIGHT=UNDERLINE,                                      *
-               COLOR=GREEN
- DFHMDF                         POS=(15,31),LENGTH=0,                  *
-               ATTRB=ASKIP
- DFHMDF                         POS=(15,53),LENGTH=6,                  *
-               INITIAL='70 €  ',                                       *
+ DFHMDF                         POS=(15,53),LENGTH=8,                  *
+               INITIAL='70 EUR',                                       *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
-MT70 DFHMDF             POS=(15,61),LENGTH=1,                          *
-               ATTRB=(UNPROT,NORM),                                    *
-               HILIGHT=UNDERLINE,                                      *
-               COLOR=GREEN
- DFHMDF                         POS=(15,63),LENGTH=0,                  *
-               ATTRB=ASKIP
- DFHMDF                         POS=(17,21),LENGTH=6,                  *
-               INITIAL='40 €  ',                                       *
+ DFHMDF                         POS=(17,21),LENGTH=8,                  *
+               INITIAL='40 EUR  ',                                     *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
-MT40 DFHMDF             POS=(17,29),LENGTH=1,                          *
-               ATTRB=(UNPROT,NORM),                                    *
-               HILIGHT=UNDERLINE,                                      *
-               COLOR=GREEN
- DFHMDF                         POS=(17,31),LENGTH=0,                  *
-               ATTRB=ASKIP
  DFHMDF                         POS=(17,42),LENGTH=16,                 *
                INITIAL='Autre Montant : ',                             *
                ATTRB=(ASKIP,NORM),                                     *
@@ -146,11 +146,16 @@ MTAUTRE DFHMDF    POS=(17,61),LENGTH=4,                                *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
 SOLDE DFHMDF          POS=(19,41),LENGTH=11,                           *
-               ATTRB=(UNPROT,NORM),                                    *
+               ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=GREEN
  DFHMDF                         POS=(19,53),LENGTH=0,                  *
                ATTRB=ASKIP
+ DFHMDF                         POS=(19,54),LENGTH=3,                  *
+               INITIAL='EUR',                                          *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=GREEN
 MESRET DFHMDF       POS=(21,5),LENGTH=70,                              *
                ATTRB=(UNPROT,NORM),                                    *
                HILIGHT=OFF,                                            *
