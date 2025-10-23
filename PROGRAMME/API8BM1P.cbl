@@ -22,9 +22,6 @@
                88 VALID-DATA                        VALUE 'Y'.
       *
 
-       01  WS-XCTL-PROGRAM-SW     PIC X VALUE 'N'.
-           88 XCTL-PROGRAM              VALUE 'Y'.
-
         01  FLAGS.
       *
            05  SEND-FLAG                   PIC X.
@@ -69,9 +66,11 @@
 
               WHEN EIBAID = DFHPA1 OR DFHPA2 OR DFHPA3
                   CONTINUE
-
+              
               WHEN EIBAID = DFHPF3 OR DFHPF12
-                    SET XCTL-PROGRAM TO TRUE
+                 EXEC CICS
+                     RETURN
+                 END-EXEC
 
               WHEN EIBAID = DFHENTER
                   PERFORM 1000-PROCESS-INPUT-MAP
@@ -94,11 +93,7 @@
               END-EXEC
            END-IF.
 
-           IF NOT XCTL-PROGRAM
-              EXEC CICS
-                  RETURN
-              END-EXEC  
-           END-IF.
+
 
        1000-PROCESS-INPUT-MAP.
            PERFORM 1100-RECEIVE-ACCUEIL-MAP.

@@ -106,8 +106,7 @@
            ELSE
               EXEC CICS
                    XCTL PROGRAM('API8BM1P')
-                   COMMAREA(WS-COMMUNICATION-AREA)
-                   LENGTH(LENGTH OF WS-COMMUNICATION-AREA)
+                   
               END-EXEC
            END-IF.
 
