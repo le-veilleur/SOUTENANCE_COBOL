@@ -97,7 +97,7 @@
                     SET SEND-DATAONLY-ALARM TO TRUE
                     PERFORM 1400-SEND-VIREMENT-MAP
            END-EVALUATE.
-
+           
            IF NOT XCTL-PROGRAM
               EXEC CICS
                    RETURN TRANSID('SN04')
