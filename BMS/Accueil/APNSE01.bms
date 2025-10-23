@@ -11,6 +11,11 @@ APNSE01  DFHMSD TYPE=&SYSPARM,                                         *
 ACU1     DFHMDI SIZE=(24,80),                                          *
                COLUMN=1,                                               *
                LINE=1
+ DFHMDF                         POS=(15,8),LENGTH=30,                  *
+               INITIAL='Retrait ou Depot (R/D/V/L) :',                 *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
  DFHMDF                         POS=(2,7),LENGTH=66,                   *
                INITIAL='************************************************
                *******************',                                   *
@@ -65,11 +70,6 @@ IDCLIENT DFHMDF POS=(10,39),LENGTH=10,                                 *
  DFHMDF                         POS=(12,8),LENGTH=60,                  *
                INITIAL='Selectionnez un des champs soit depot soit retr*
                ait : ',                                                *
-               ATTRB=(ASKIP,NORM),                                     *
-               HILIGHT=OFF,                                            *
-               COLOR=NEUTRAL
- DFHMDF                         POS=(15,12),LENGTH=27,                 *
-               INITIAL='Retrait ou Depot (R/D)    :',                  *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL

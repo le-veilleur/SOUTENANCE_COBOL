@@ -128,13 +128,13 @@
        1150-LIRE-SOLDE.
            EXEC SQL
              SELECT SOLDE
-             INTO :WS-SOLDE
+             INTO :DCLCOMPTE.WS-SOLDE
              FROM API8.COMPTE
              WHERE ID_CLIENT = :WS-COMMUNICATION-AREA
            END-EXEC.
            
            IF SQLCODE = 0
-                MOVE WS-SOLDE TO WS-SOLDE-DISPLAY
+                MOVE WS-SOLDE OF DCLCOMPTE TO WS-SOLDE-DISPLAY
                 MOVE WS-SOLDE-DISPLAY TO SOLDEO
            ELSE
                 MOVE 'Erreur lecture compte' TO MESDEPO

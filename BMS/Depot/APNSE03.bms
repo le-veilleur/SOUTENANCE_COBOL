@@ -39,7 +39,7 @@ DEPO    DFHMDI SIZE=(24,80),                                           *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
-INPUTDEP DFHMDF POS=(12,50),LENGTH=4,                                  *
+INPUTDEP DFHMDF                 POS=(12,50),LENGTH=4,                  *
                ATTRB=(UNPROT,IC,NORM),                                 *
                HILIGHT=UNDERLINE,                                      *
                COLOR=GREEN
@@ -52,11 +52,16 @@ INPUTDEP DFHMDF POS=(12,50),LENGTH=4,                                  *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
-SOLDE DFHMDF          POS=(16,50),LENGTH=11,                           *
-               ATTRB=(UNPROT,NORM),                                    *
+SOLDE DFHMDF          POS=(16,46),LENGTH=15,                           *
+               ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=GREEN
- DFHMDF                         POS=(16,62),LENGTH=0,                  *
+ DFHMDF                         POS=(16,62),LENGTH=3,                  *
+               INITIAL='EUR',                                          *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=GREEN
+ DFHMDF                         POS=(16,66),LENGTH=0,                  *
                ATTRB=ASKIP
 MESDEP DFHMDF       POS=(18,3),LENGTH=70,                              *
                ATTRB=(UNPROT,NORM),                                    *
