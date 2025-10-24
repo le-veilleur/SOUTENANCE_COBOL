@@ -69,16 +69,18 @@
        01  WS-OP-INDEX                     PIC 9(2) VALUE 0.
        
       * Variables de pagination
-       01  WS-PAGE-NUMBER                  PIC 9(3) VALUE 1.
-       01  WS-TOTAL-OPERATIONS             PIC 9(5) VALUE 0.
-       01  WS-PAGE-OFFSET                  PIC 9(5) VALUE 0.
-       01  WS-MAX-PER-PAGE                 PIC 9(2) VALUE 10.
+       01  WS-PAGE-NUMBER                  PIC S9(4) COMP VALUE 1.
+       01  WS-TOTAL-OPERATIONS             PIC S9(4) COMP VALUE 0.
+       01  WS-PAGE-OFFSET                  PIC S9(4) COMP VALUE 0.
+       01  WS-MAX-PER-PAGE                 PIC S9(4) COMP VALUE 10.
+       01  WS-PAGE-DISPLAY                 PIC 9(3) VALUE 1.
+       01  WS-TOTAL-DISPLAY                PIC 9(5) VALUE 0.
        
        
        LINKAGE SECTION.
        01  DFHCOMMAREA.
            05 DFHCOM-ID-CLIENT PIC S9(9) COMP.
-           05 DFHCOM-PAGE-NUM  PIC 9(3) COMP-3.
+           05 DFHCOM-PAGE-NUM  PIC S9(4) COMP.
        
        PROCEDURE DIVISION.
        
@@ -97,8 +99,8 @@
                     MOVE LOW-VALUES TO LISTO
                     MOVE 1 TO WS-PAGE-NUMBER
                     MOVE 0 TO WS-PAGE-OFFSET
-                    MOVE '1' TO PAGEO
-                    MOVE '0' TO TOTALO
+                    MOVE 1 TO WS-PAGE-DISPLAY
+                    MOVE WS-PAGE-DISPLAY TO PAGEO
                     MOVE SPACES TO MESSAGEO
                     PERFORM 1050-LIRE-NOM
                     PERFORM 1060-LIRE-COMPTE
@@ -120,14 +122,6 @@
                       PERFORM 1060-LIRE-COMPTE
                       PERFORM 1200-LOAD-CLIENT-OPERATIONS
                       PERFORM 1300-BUILD-OPERATION-LINE
-                      STRING 'F7: PAGE=' DELIMITED BY SIZE
-                             WS-PAGE-NUMBER DELIMITED BY SIZE
-                             ' OFFSET=' DELIMITED BY SIZE
-                             WS-PAGE-OFFSET DELIMITED BY SIZE
-                             ' COUNT=' DELIMITED BY SIZE
-                             WS-OP-COUNT DELIMITED BY SIZE
-                             INTO MESSAGEO
-                      END-STRING
                       SET SEND-ERASE TO TRUE
                       PERFORM 1400-SEND-LIST-MAP
           
@@ -281,6 +275,7 @@
               EVALUATE SQLCODE
                  WHEN 0
                      ADD 1 TO WS-OP-COUNT
+                     ADD 1 TO WS-TOTAL-OPERATIONS
                      MOVE WS-ID-OPERATION OF DCLOPERATION TO WS-TEMP-ID
                      MOVE WS-ID-COMPTE     OF DCLOPERATION 
                      TO WS-TEMP-ACCOUNT-ID
@@ -291,7 +286,7 @@
                      MOVE WS-DATE-OP       OF DCLOPERATION 
                      TO WS-TEMP-DATE
                      MOVE WS-TEMP-AMOUNT TO WS-TEMP-AMOUNT-DISPLAY
-           
+          
                      MOVE SPACES TO OPERATION-LINE
                      MOVE WS-TEMP-ID             
                      TO OPERATION-LINE(10:10)
@@ -305,7 +300,7 @@
                      TO OPERATION-LINE(59:10)
                      MOVE SPACES
                      TO OPERATION-LINE(69:11)
-           
+          
                     MOVE OPERATION-LINE TO OPELISTO(WS-OP-INDEX)
                     MOVE 70 TO OPELISTL(WS-OP-INDEX)
                     ADD 1 TO WS-OP-INDEX
@@ -317,6 +312,20 @@
                      MOVE 'ERREUR LECTURE OPERATIONS' TO MESSAGEO
                      MOVE 11 TO WS-OP-INDEX
               END-EVALUATE
+           END-PERFORM
+           
+      *    Continuer à compter les opérations restantes
+           PERFORM UNTIL SQLCODE NOT = 0
+              EXEC SQL
+                 FETCH CUSTAPI8 INTO :DCLOPERATION.WS-ID-OPERATION,
+                                        :DCLOPERATION.WS-ID-COMPTE,
+                                        :DCLOPERATION.WS-MONTANT-OP,
+                                        :DCLOPERATION.WS-TYPE-OP,
+                                        :DCLOPERATION.WS-DATE-OP
+              END-EXEC
+              IF SQLCODE = 0
+                 ADD 1 TO WS-TOTAL-OPERATIONS
+              END-IF
            END-PERFORM.
            
            
@@ -325,7 +334,8 @@
            IF WS-OP-COUNT = 0
               MOVE 'AUCUNE OPERATION TROUVEE' TO OPELISTO(1)
            END-IF
-           MOVE WS-OP-COUNT TO TOTALO.
+           MOVE WS-TOTAL-OPERATIONS TO WS-TOTAL-DISPLAY
+           MOVE WS-TOTAL-DISPLAY TO TOTALO.
 
        1400-SEND-LIST-MAP.
            EVALUATE TRUE
@@ -368,12 +378,14 @@
            END-IF
            COMPUTE WS-PAGE-OFFSET = 
                (WS-PAGE-NUMBER - 1) * WS-MAX-PER-PAGE.
-           MOVE WS-PAGE-NUMBER TO PAGEO.
+           MOVE WS-PAGE-NUMBER TO WS-PAGE-DISPLAY
+           MOVE WS-PAGE-DISPLAY TO PAGEO.
        
        1600-PAGE-SUIVANTE.
       *    Aller à la page suivante
            ADD 1 TO WS-PAGE-NUMBER
            COMPUTE WS-PAGE-OFFSET = 
                (WS-PAGE-NUMBER - 1) * WS-MAX-PER-PAGE.
-           MOVE WS-PAGE-NUMBER TO PAGEO.
+           MOVE WS-PAGE-NUMBER TO WS-PAGE-DISPLAY
+           MOVE WS-PAGE-DISPLAY TO PAGEO.
       
