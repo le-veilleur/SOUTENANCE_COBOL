@@ -97,5 +97,10 @@ MESSAGE DFHMDF    POS=(23,4),LENGTH=60,                                *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=RED
+ DFHMDF                         POS=(24,2),LENGTH=76,                  *
+               INITIAL='F3: RETOUR   F7: PAGE PREC   F8: PAGE SUIV',   *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=BLUE
 APNSE05  DFHMSD TYPE=FINAL
          END

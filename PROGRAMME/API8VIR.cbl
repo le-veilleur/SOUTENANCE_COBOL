@@ -194,10 +194,11 @@
                     SET SOLDE = SOLDE + :WS-MONTANT-VIREMENT
                     WHERE ID_CLIENT = :WS-ID-BENEF
                     END-EXEC
-                    EVALUATE SQLCODE
-                       WHEN 0
-                          PERFORM 1600-INSERT-OPERATION
-                          MOVE 'VIREMENT EFFECTUE' TO MESVIRO
+                   EVALUATE SQLCODE
+                      WHEN 0
+                         PERFORM 1600-INSERT-OPERATION
+                         PERFORM 1610-INSERT-OPERATION-BENEF
+                         MOVE 'VIREMENT EFFECTUE' TO MESVIRO
                        WHEN 100
                           MOVE 'N' TO VALID-DATA-SW
                           MOVE 'BENEFICIAIRE INEXISTANT' TO MESVIRO
@@ -314,7 +315,7 @@
 
       *       Preparer les donnees de l'operation
               MOVE WS-MONTANT-VIREMENT TO WS-MONTANT-OP OF DCLOPERATION
-              MOVE 'V' TO WS-TYPE-OP OF DCLOPERATION
+              MOVE 'R' TO WS-TYPE-OP OF DCLOPERATION
 
       *       Inserer l'operation dans la table OPERATION
               EXEC SQL
@@ -345,6 +346,68 @@
               END-EVALUATE
            ELSE
               MOVE 'ERREUR COMPTE INTROUVABLE' TO MESVIRO
+              PERFORM 1290-CLEAR-ALL-FIELDS
+           END-IF.
+
+       1610-INSERT-OPERATION-BENEF.
+      *    Recuperer l'ID_COMPTE du beneficiaire a partir de ID_CLIENT
+           EXEC SQL
+              SELECT ID_COMPTE
+              INTO :DCLOPERATION.WS-ID-COMPTE
+              FROM API8.COMPTE
+              WHERE ID_CLIENT = :WS-ID-BENEF
+           END-EXEC.
+
+           IF SQLCODE = 0
+      *       Compte trouve - chercher le MAX des operations
+              EXEC SQL
+                 SELECT MAX(ID_OPERATION)
+                 INTO :DCLOPERATION.WS-ID-OPERATION :WS-NULL-INDICATOR
+                 FROM API8.OPERATION
+              END-EXEC
+
+      *       Gerer le cas table vide ou valeur NULL
+              IF WS-NULL-INDICATOR = -1
+      *          Table OPERATION vide - commencer a 1
+                 MOVE 1 TO WS-ID-OPERATION OF DCLOPERATION
+              ELSE
+      *          Operations existent - incrementer le max
+                 ADD 1 TO WS-ID-OPERATION OF DCLOPERATION
+              END-IF
+
+      *       Preparer les donnees de l'operation
+              MOVE WS-MONTANT-VIREMENT TO WS-MONTANT-OP OF DCLOPERATION
+              MOVE 'D' TO WS-TYPE-OP OF DCLOPERATION
+
+      *       Inserer l'operation dans la table OPERATION
+              EXEC SQL
+                 INSERT INTO API8.OPERATION
+                    (ID_OPERATION, ID_COMPTE, MONTANT_OP,
+                     TYPE_OP, DATE_OP)
+                 VALUES
+                    (:DCLOPERATION.WS-ID-OPERATION,
+                     :DCLOPERATION.WS-ID-COMPTE,
+                     :DCLOPERATION.WS-MONTANT-OP,
+                     :DCLOPERATION.WS-TYPE-OP,
+                     CURRENT DATE)
+              END-EXEC
+
+      *       Verifier si l'insertion a reussi
+              EVALUATE SQLCODE
+                 WHEN 0
+                    CONTINUE
+                 WHEN -803
+                    MOVE 'ID OPERATION EN DOUBLE (BENEF)' TO MESVIRO
+                    PERFORM 1290-CLEAR-ALL-FIELDS
+                 WHEN -530
+                    MOVE 'COMPTE INVALIDE OPERATION (BENEF)' TO MESVIRO
+                    PERFORM 1290-CLEAR-ALL-FIELDS
+                 WHEN OTHER
+                    MOVE 'ERREUR ENREGISTREMENT OP (BENEF)' TO MESVIRO
+                    PERFORM 1290-CLEAR-ALL-FIELDS
+              END-EVALUATE
+           ELSE
+              MOVE 'ERREUR COMPTE BENEF INTROUVABLE' TO MESVIRO
               PERFORM 1290-CLEAR-ALL-FIELDS
            END-IF.
            

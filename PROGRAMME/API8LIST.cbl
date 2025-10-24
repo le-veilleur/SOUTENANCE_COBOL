@@ -68,33 +68,35 @@
        01  WS-OP-COUNT                     PIC 9(2) VALUE 0.
        01  WS-OP-INDEX                     PIC 9(2) VALUE 0.
        
+      * Variables de pagination
+       01  WS-PAGE-NUMBER                  PIC 9(3) VALUE 1.
+       01  WS-TOTAL-OPERATIONS             PIC 9(5) VALUE 0.
+       01  WS-PAGE-OFFSET                  PIC 9(5) VALUE 0.
+       01  WS-MAX-PER-PAGE                 PIC 9(2) VALUE 10.
+       
        
        LINKAGE SECTION.
        01  DFHCOMMAREA.
            05 DFHCOM-ID-CLIENT PIC S9(9) COMP.
+           05 DFHCOM-PAGE-NUM  PIC 9(3) COMP-3.
        
        PROCEDURE DIVISION.
        
        0000-MAIN-PROCEDURE.
            IF EIBCALEN > ZERO
                  MOVE DFHCOM-ID-CLIENT TO WS-COMMUNICATION-AREA
+                 IF EIBCALEN >= 6
+                    MOVE DFHCOM-PAGE-NUM TO WS-PAGE-NUMBER
+                    COMPUTE WS-PAGE-OFFSET = 
+                        (WS-PAGE-NUMBER - 1) * WS-MAX-PER-PAGE
+                 END-IF
               END-IF.
            
               EVALUATE TRUE
-                 WHEN EIBCALEN = 4
+                 WHEN EIBCALEN = 4 OR EIBAID = DFHCLEAR
                     MOVE LOW-VALUES TO LISTO
-                    MOVE '1' TO PAGEO
-                    MOVE '0' TO TOTALO
-                    MOVE SPACES TO MESSAGEO
-                    PERFORM 1050-LIRE-NOM
-                    PERFORM 1060-LIRE-COMPTE
-                    PERFORM 1200-LOAD-CLIENT-OPERATIONS
-                    PERFORM 1300-BUILD-OPERATION-LINE
-                    SET SEND-ERASE TO TRUE
-                    PERFORM 1400-SEND-LIST-MAP
-           
-                 WHEN EIBAID = DFHCLEAR
-                    MOVE LOW-VALUES TO LISTO
+                    MOVE 1 TO WS-PAGE-NUMBER
+                    MOVE 0 TO WS-PAGE-OFFSET
                     MOVE '1' TO PAGEO
                     MOVE '0' TO TOTALO
                     MOVE SPACES TO MESSAGEO
@@ -110,6 +112,34 @@
            
                  WHEN EIBAID = DFHPF3 OR DFHPF12
                       SET XCTL-PROGRAM TO TRUE
+           
+                 WHEN EIBAID = DFHPF7
+                      MOVE LOW-VALUES TO LISTO
+                      PERFORM 1500-PAGE-PRECEDENTE
+                      PERFORM 1050-LIRE-NOM
+                      PERFORM 1060-LIRE-COMPTE
+                      PERFORM 1200-LOAD-CLIENT-OPERATIONS
+                      PERFORM 1300-BUILD-OPERATION-LINE
+                      STRING 'F7: PAGE=' DELIMITED BY SIZE
+                             WS-PAGE-NUMBER DELIMITED BY SIZE
+                             ' OFFSET=' DELIMITED BY SIZE
+                             WS-PAGE-OFFSET DELIMITED BY SIZE
+                             ' COUNT=' DELIMITED BY SIZE
+                             WS-OP-COUNT DELIMITED BY SIZE
+                             INTO MESSAGEO
+                      END-STRING
+                      SET SEND-ERASE TO TRUE
+                      PERFORM 1400-SEND-LIST-MAP
+          
+                 WHEN EIBAID = DFHPF8
+                      MOVE LOW-VALUES TO LISTO
+                      PERFORM 1600-PAGE-SUIVANTE
+                      PERFORM 1050-LIRE-NOM
+                      PERFORM 1060-LIRE-COMPTE
+                      PERFORM 1200-LOAD-CLIENT-OPERATIONS
+                      PERFORM 1300-BUILD-OPERATION-LINE
+                      SET SEND-ERASE TO TRUE
+                      PERFORM 1400-SEND-LIST-MAP
            
                  WHEN EIBAID = DFHENTER
                      PERFORM 1000-TRAITER-SAISIE
@@ -127,9 +157,10 @@
               END-EVALUATE.
            
            IF NOT XCTL-PROGRAM
+              MOVE WS-PAGE-NUMBER TO DFHCOM-PAGE-NUM
               EXEC CICS RETURN TRANSID('SN05')
                     COMMAREA(DFHCOMMAREA)
-                    LENGTH(10)
+                    LENGTH(LENGTH OF DFHCOMMAREA)
               END-EXEC
            ELSE
               EXEC CICS XCTL PROGRAM('API8BM1P')
@@ -143,6 +174,7 @@
            PERFORM 1060-LIRE-COMPTE.
        
        1050-LIRE-NOM.
+           MOVE SPACES TO NCPTEO
            EXEC SQL
               SELECT PRENOM_CLIENT
               INTO :DCLCLIENT.WS-PRENOM-CLIENT
@@ -150,11 +182,14 @@
               WHERE ID_CLIENT = :WS-COMMUNICATION-AREA
            END-EXEC.
            
-           IF SQLCODE = 0
-              MOVE WS-PRENOM-CLIENT OF DCLCLIENT TO NCPTEO
-           ELSE
-              MOVE 'CLIENT INCONNU' TO NCPTEO
-           END-IF.
+           EVALUATE SQLCODE
+              WHEN 0
+                 MOVE WS-PRENOM-CLIENT OF DCLCLIENT TO NCPTEO
+              WHEN 100
+                 MOVE 'CLIENT INCONNU' TO NCPTEO
+              WHEN OTHER
+                 MOVE 'ERREUR SQL' TO NCPTEO
+           END-EVALUATE.
       
        1060-LIRE-COMPTE.
            EXEC SQL
@@ -212,6 +247,27 @@
        1210-FETCH-OPERATIONS.
            MOVE 1 TO WS-OP-INDEX.
            MOVE 0 TO WS-OP-COUNT.
+           MOVE 0 TO WS-TOTAL-OPERATIONS.
+           
+      *    Nettoyer OPELISTO avant de remplir
+           PERFORM VARYING WS-OP-INDEX FROM 1 BY 1 
+                   UNTIL WS-OP-INDEX > 10
+              MOVE SPACES TO OPELISTO(WS-OP-INDEX)
+              MOVE 70 TO OPELISTL(WS-OP-INDEX)
+           END-PERFORM
+           MOVE 1 TO WS-OP-INDEX
+           
+      *    Sauter les lignes des pages précédentes
+           PERFORM WS-PAGE-OFFSET TIMES
+              EXEC SQL
+                 FETCH CUSTAPI8 INTO :DCLOPERATION.WS-ID-OPERATION,
+                                     :DCLOPERATION.WS-ID-COMPTE,
+                                     :DCLOPERATION.WS-MONTANT-OP,
+                                     :DCLOPERATION.WS-TYPE-OP,
+                                     :DCLOPERATION.WS-DATE-OP
+              END-EXEC
+              ADD 1 TO WS-TOTAL-OPERATIONS
+           END-PERFORM
            
            PERFORM UNTIL WS-OP-INDEX > 10
               EXEC SQL
@@ -250,8 +306,9 @@
                      MOVE SPACES
                      TO OPERATION-LINE(69:11)
            
-                     MOVE OPERATION-LINE TO OPELISTO(WS-OP-INDEX)
-                     ADD 1 TO WS-OP-INDEX
+                    MOVE OPERATION-LINE TO OPELISTO(WS-OP-INDEX)
+                    MOVE 70 TO OPELISTL(WS-OP-INDEX)
+                    ADD 1 TO WS-OP-INDEX
                      
                  WHEN 100
                      MOVE 11 TO WS-OP-INDEX
@@ -293,6 +350,7 @@
            END-EVALUATE.
        
        1410-RETURN-TO-LIST.
+           MOVE WS-PAGE-NUMBER TO DFHCOM-PAGE-NUM
            EXEC CICS RETURN TRANSID('SN05')
               COMMAREA(DFHCOMMAREA)
               LENGTH(LENGTH OF DFHCOMMAREA)
@@ -303,6 +361,19 @@
               XCTL PROGRAM('API8BM1P')
            END-EXEC.
        
+       1500-PAGE-PRECEDENTE.
+      *    Aller à la page précédente
+           IF WS-PAGE-NUMBER > 1
+              SUBTRACT 1 FROM WS-PAGE-NUMBER
+           END-IF
+           COMPUTE WS-PAGE-OFFSET = 
+               (WS-PAGE-NUMBER - 1) * WS-MAX-PER-PAGE.
+           MOVE WS-PAGE-NUMBER TO PAGEO.
        
-       
+       1600-PAGE-SUIVANTE.
+      *    Aller à la page suivante
+           ADD 1 TO WS-PAGE-NUMBER
+           COMPUTE WS-PAGE-OFFSET = 
+               (WS-PAGE-NUMBER - 1) * WS-MAX-PER-PAGE.
+           MOVE WS-PAGE-NUMBER TO PAGEO.
       
