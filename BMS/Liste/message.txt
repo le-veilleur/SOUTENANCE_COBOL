@@ -1,0 +1,73 @@
+APNSE05  DFHMSD TYPE=&SYSPARM,                                         *
+               MODE=INOUT,                                             *
+               LANG=COBOL,                                             *
+               STORAGE=AUTO,                                           *
+               CTRL=FREEKB,                                            *
+               EXTATT=YES,                                             *
+               TERM=3270-2,                                            *
+               TIOAPFX=YES,                                            *
+               MAPATTS=(COLOR,HILIGHT,OUTLINE,PS,SOSI),                *
+               DSATTS=(COLOR,HILIGHT,OUTLINE,PS,SOSI)
+MAP1     DFHMDI SIZE=(24,80),                                          *
+               COLUMN=1,                                               *
+               LINE=1
+ DFHMDF                         POS=(2,9),LENGTH=66,                   *
+               INITIAL='************************************************
+               *******************',                                   *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(3,9),LENGTH=66,                   *
+               INITIAL='**************************** MENU CONS  ********
+               *******************',                                   *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(4,9),LENGTH=66,                   *
+               INITIAL='************************************************
+               *******************',                                   *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(6,22),LENGTH=19,                  *
+               INITIAL='Compte Client de : ',                          *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+NCPTE DFHMDF          POS=(6,43),LENGTH=15,                            *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=GREEN
+ DFHMDF                         POS=(6,59),LENGTH=0,                   *
+               ATTRB=ASKIP
+ DFHMDF                         POS=(11,49),LENGTH=10,                 *
+               INITIAL='TYPE OP',                                      *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(11,64),LENGTH=10,                 *
+               INITIAL='date op',                                      *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(13,5),LENGTH=69,                  *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(11,35),LENGTH=10,                 *
+               INITIAL='Montant OP',                                   *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(11,22),LENGTH=10,                 *
+               INITIAL='ID compte',                                    *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+ DFHMDF                         POS=(11,5),LENGTH=15,                  *
+               INITIAL='ID Operation ',                                *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=NEUTRAL
+APNSE05  DFHMSD TYPE=FINAL
+         END

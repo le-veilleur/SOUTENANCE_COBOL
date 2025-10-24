@@ -1,0 +1,511 @@
+       IDENTIFICATION  DIVISION.
+       PROGRAM-ID.  VOL0855P.
+      *
+       ENVIRONMENT DIVISION.
+      *
+       DATA DIVISION.
+      *
+       WORKING-STORAGE SECTION.
+
+                EXEC SQL
+                      INCLUDE SQLCA
+                END-EXEC.
+                EXEC SQL
+                      INCLUDE VOL
+                END-EXEC.
+
+       01  WS-PAGINATION.
+           05 WS-PAGE-SIZE     PIC S9(4)  COMP VALUE 5.
+           05 WS-PAGE-NO       PIC S9(4)  COMP VALUE 1.
+           05 WS-TOTAL-ROWS    PIC S9(9)  COMP VALUE 0.
+           05 WS-MAX-PAGE      PIC S9(4)  COMP VALUE 1.
+           05 WS-START-IDX     PIC S9(4)  COMP VALUE 1.
+           05 WS-END-IDX       PIC S9(4)  COMP VALUE 5.
+
+       01 WS-PAGE-TEXT.
+           05 FILLER PIC X(5) VALUE 'Page '.
+           05 WS-PG-NO PIC 99.
+           05 FILLER PIC X(3) VALUE ' / '.
+           05 WS-PG-MAX PIC 99.
+
+       01  WS-LISTE-VOLS.
+           05 WS-VOL OCCURS 100 TIMES.
+              10 WS-MY-ID-VOL          PIC X(10).
+              10 WS-MY-NUMERO-VOL      PIC X(5).
+              10 WS-MY-ORIGINE         PIC X(15).
+              10 WS-MY-VILLE-ARRIVEE   PIC X(15).
+              10 WS-MY-DATE-DEPART     PIC X(10).
+              10 WS-MY-DATE-ARRIVEE    PIC X(10).
+
+       01  WS-VOL-TEMP.
+           05 WS-TMP-ID-VOL            PIC X(10).
+           05 WS-TMP-NUMERO-VOL        PIC X(5).
+           05 WS-TMP-ORIGINE           PIC X(15).
+           05 WS-TMP-VILLE-ARRIVEE     PIC X(15).
+           05 WS-TMP-DATE-DEPART       PIC X(10).
+           05 WS-TMP-DATE-ARRIVEE      PIC X(10).
+
+       01  WS-I                        PIC S9(4) COMP.
+       01  WS-K                        PIC S9(4) COMP.
+       01  WS-TABLE-COUNT              PIC S9(4) COMP VALUE 0.
+       01  WS-INDEX                    PIC S9(4) COMP.
+       01  WS-NVOL-SAISIE              PIC X(5).
+
+
+       01  WS-NOMMAPSET                PIC X(7) VALUE 'VS0855P'.
+       01  WS-NOMMAP                   PIC X(7) VALUE 'VM0855P'.
+       01  WS-TRANSID                  PIC X(4) VALUE 'VP08'.
+       01  WS-BACKSCREEN               PIC X(8) VALUE 'VOL0755P'.
+
+       01  WS-SELECTED-VOL.
+           05 WS-SEL-ID-VOL            PIC X(10).
+           05 WS-SEL-NUMERO-VOL        PIC X(5).
+
+       01  SWITCHES.
+           05  VALID-DATA-SW           PIC X(01) VALUE 'Y'.
+               88  VALID-DATA          VALUE 'Y'.
+           05  SEARCH-MODE-SW          PIC X(01) VALUE 'N'.
+               88  SEARCH-MODE         VALUE 'Y'.
+               88  NO-SEARCH-MODE      VALUE 'N'.
+           05  PAGINATION-MODE-SW      PIC X(01) VALUE 'N'.
+               88  PAGINATION-MODE     VALUE 'Y'.
+               88  NO-PAGINATION-MODE  VALUE 'N'.
+
+       01  FLAGS.
+           05  SEND-FLAG               PIC X(01).
+               88  SEND-ERASE          VALUE '1'.
+               88  SEND-DATAONLY       VALUE '2'.
+               88  SEND-DATAONLY-ALARM VALUE '3'.
+           05 WS-DATA-LOADED           PIC X(01) VALUE 'N'.
+               88 WS-DATA-NOT-LOADED   VALUE 'N'.
+               88 WS-DATA-ALREADY-LOADED VALUE 'Y'.
+
+       01  WS-FIRST-ACCESS          PIC X(01) VALUE 'Y'.
+           88 FIRST-ACCESS          VALUE 'Y'.
+           88 NOT-FIRST-ACCESS      VALUE 'N'.
+
+
+       01  END-OF-SESSION-MESSAGE      PIC X(15) VALUE 'Fin de session'.
+      * zone de travail pour la commaerea
+       01  COMMUNICATION-AREA.
+           05 CA-FIRST-ACCESS          PIC X(01).
+           05 CA-PAGE-NO-DIS           PIC 9(4).
+
+
+       COPY VS0855P.
+       COPY DFHAID.
+       COPY ATTR.
+
+       LINKAGE SECTION.
+       01  DFHCOMMAREA.
+           05 LK-COMMAREA-BUF          PIC X(4096).
+
+       PROCEDURE DIVISION.
+
+       0000-PROCESS-MASTER-MENU.
+
+      *> 1. RÉCUPÉRER l'état depuis la COMMAREA
+           IF EIBCALEN >= 5
+              MOVE DFHCOMMAREA          TO COMMUNICATION-AREA
+              MOVE CA-FIRST-ACCESS      TO WS-FIRST-ACCESS
+              IF CA-PAGE-NO-DIS > 0
+                 MOVE CA-PAGE-NO-DIS    TO WS-PAGE-NO
+              END-IF
+           ELSE
+              MOVE 'Y'                  TO WS-FIRST-ACCESS
+              MOVE 1                    TO WS-PAGE-NO
+           END-IF
+
+           EVALUATE TRUE
+                WHEN EIBCALEN = ZERO
+                      MOVE LOW-VALUE TO VM0855PO
+                      SET SEND-ERASE TO TRUE
+                      SET NO-SEARCH-MODE TO TRUE
+                      IF WS-DATA-NOT-LOADED
+                         PERFORM 1200-LOAD-ALL-VOLS-FROM-DB2
+                      END-IF
+                      PERFORM 1300-LOAD-CURRENT-PAGE
+                      PERFORM 1400-SEND-SCREEN-LIST-MAP
+
+                WHEN EIBAID = DFHENTER AND FIRST-ACCESS
+      *> PREMIER ENTER après arrivée on charge la liste des vols et
+      * on va gérer le cas où aucun vol n'est saisi
+                      SET NOT-FIRST-ACCESS TO TRUE
+                      MOVE 'N' TO WS-FIRST-ACCESS
+                      SET SEND-DATAONLY TO TRUE
+                      IF WS-DATA-NOT-LOADED
+                         PERFORM 1200-LOAD-ALL-VOLS-FROM-DB2
+                      END-IF
+                      PERFORM 1300-LOAD-CURRENT-PAGE
+                      PERFORM 1400-SEND-SCREEN-LIST-MAP
+
+                WHEN EIBAID = DFHENTER AND NOT-FIRST-ACCESS
+      *> VRAI ENTER DE RECHERCHE
+                      EXEC CICS
+                           RECEIVE MAP(WS-NOMMAP)
+                                   MAPSET(WS-NOMMAPSET)
+                                   INTO(VM0855PI)
+                      END-EXEC
+                      MOVE NVOLO TO WS-NVOL-SAISIE
+                      INSPECT WS-NVOL-SAISIE REPLACING ALL '_' BY ' '
+
+                      IF WS-NVOL-SAISIE = SPACES OR LOW-VALUE
+                         MOVE 'Veuillez saisir un numero de vol'
+                           TO ALERTO
+                         SET SEND-DATAONLY-ALARM TO TRUE
+                     IF WS-DATA-NOT-LOADED
+                         PERFORM 1200-LOAD-ALL-VOLS-FROM-DB2
+                      END-IF
+                      PERFORM 1300-LOAD-CURRENT-PAGE
+                         PERFORM 1400-SEND-SCREEN-LIST-MAP
+                      ELSE
+                         SET SEARCH-MODE TO TRUE
+                         PERFORM 1500-SEARCH-VOLS
+                         SET SEND-DATAONLY TO TRUE
+                         PERFORM 1400-SEND-SCREEN-LIST-MAP
+                      END-IF
+
+                WHEN EIBAID = DFHPF3 OR DFHPF12
+                      EXEC CICS
+                         XCTL PROGRAM(WS-BACKSCREEN)
+                      END-EXEC
+
+                WHEN EIBAID = DFHPF8
+                     MOVE 'Y' TO WS-FIRST-ACCESS
+
+                     IF WS-DATA-NOT-LOADED
+                         PERFORM 1200-LOAD-ALL-VOLS-FROM-DB2
+                     END-IF
+                     IF WS-PAGE-NO < WS-MAX-PAGE
+                         ADD 1 TO WS-PAGE-NO
+                     END-IF
+                     SET SEND-DATAONLY TO TRUE
+                     SET PAGINATION-MODE TO TRUE
+                     PERFORM 1300-LOAD-CURRENT-PAGE
+                     PERFORM 1400-SEND-SCREEN-LIST-MAP
+
+                WHEN EIBAID = DFHPF7
+                     MOVE 'Y' TO WS-FIRST-ACCESS
+
+                     IF WS-DATA-NOT-LOADED
+                         PERFORM 1200-LOAD-ALL-VOLS-FROM-DB2
+                     END-IF
+                     IF WS-PAGE-NO > 1
+                         SUBTRACT 1 FROM WS-PAGE-NO
+                     END-IF
+                     SET SEND-DATAONLY TO TRUE
+                     SET PAGINATION-MODE TO TRUE
+                     PERFORM 1300-LOAD-CURRENT-PAGE
+                     PERFORM 1400-SEND-SCREEN-LIST-MAP
+
+                WHEN OTHER
+                     IF WS-DATA-NOT-LOADED
+                         PERFORM 1200-LOAD-ALL-VOLS-FROM-DB2
+                     END-IF
+                     MOVE SPACES TO MESSAGEO
+                     MOVE 'TOUCHE INVALIDE' TO ALERTO
+                     SET SEND-DATAONLY-ALARM TO TRUE
+                     PERFORM 1300-LOAD-CURRENT-PAGE
+                     PERFORM 1400-SEND-SCREEN-LIST-MAP
+           END-EVALUATE.
+
+      *> 2. SAUVEGARDER l'état dans la COMMAREA
+
+           MOVE WS-FIRST-ACCESS TO CA-FIRST-ACCESS
+           MOVE WS-PAGE-NO      TO CA-PAGE-NO-DIS
+
+           EXEC CICS
+                RETURN TRANSID(WS-TRANSID)
+                      COMMAREA(COMMUNICATION-AREA)
+                      LENGTH(5)
+           END-EXEC.
+
+
+       1200-LOAD-ALL-VOLS-FROM-DB2.
+      *> Charger tous les vols depuis la table VOL de DB2
+           MOVE 0 TO WS-TABLE-COUNT
+           MOVE 0 TO SQLCODE
+
+           PERFORM VARYING WS-K FROM 1 BY 1 UNTIL WS-K > 100
+              MOVE SPACES TO WS-MY-ID-VOL(WS-K)
+                             WS-MY-NUMERO-VOL(WS-K)
+                             WS-MY-ORIGINE(WS-K)
+                             WS-MY-VILLE-ARRIVEE(WS-K)
+                             WS-MY-DATE-DEPART(WS-K)
+                             WS-MY-DATE-ARRIVEE(WS-K)
+           END-PERFORM.
+      *  OUVERTURE CURSEUR POUR LECTURE DE TOUS LES VOLS
+           EXEC SQL
+                DECLARE C_VOL CURSOR FOR
+                    SELECT CHAR(ID_VOL),
+                           NUMERO_VOL,
+                           ORIGINE,
+                           VILLE_ARRIVEE,
+                           CHAR(DATE_DEPART),
+                           CHAR(DATE_ARRIVEE)
+                    FROM API5.VOL
+                    ORDER BY ID_VOL ASC
+           END-EXEC.
+
+           EXEC SQL OPEN C_VOL END-EXEC.
+      *  LECTURE DES ENREGISTREMENTS
+           MOVE 1 TO WS-I
+           PERFORM UNTIL SQLCODE NOT = 0 OR WS-I > 100
+                EXEC SQL
+                     FETCH C_VOL INTO
+                            :WS-TMP-ID-VOL,
+                            :WS-TMP-NUMERO-VOL,
+                            :WS-TMP-ORIGINE,
+                            :WS-TMP-VILLE-ARRIVEE,
+                            :WS-TMP-DATE-DEPART,
+                            :WS-TMP-DATE-ARRIVEE
+                END-EXEC
+      *  SI LECTURE OK, STOCKER DANS TABLEAU
+            IF SQLCODE = 0
+               MOVE WS-TMP-ID-VOL        TO WS-MY-ID-VOL(WS-I)
+               MOVE WS-TMP-NUMERO-VOL    TO WS-MY-NUMERO-VOL(WS-I)
+               MOVE WS-TMP-ORIGINE       TO WS-MY-ORIGINE(WS-I)
+               MOVE WS-TMP-VILLE-ARRIVEE TO WS-MY-VILLE-ARRIVEE(WS-I)
+               MOVE WS-TMP-DATE-DEPART   TO WS-MY-DATE-DEPART(WS-I)
+               MOVE WS-TMP-DATE-ARRIVEE  TO WS-MY-DATE-ARRIVEE(WS-I)
+               ADD 1 TO WS-TABLE-COUNT
+               ADD 1 TO WS-I
+            END-IF
+           END-PERFORM.
+
+           EXEC SQL CLOSE C_VOL END-EXEC.
+
+      *  CALCULER LE NOMBRE DE PAGES
+           MOVE WS-TABLE-COUNT TO WS-TOTAL-ROWS
+           COMPUTE WS-MAX-PAGE =
+              (WS-TOTAL-ROWS + WS-PAGE-SIZE - 1) / WS-PAGE-SIZE.
+      *     MOVE 1 TO WS-PAGE-NO.
+           SET WS-DATA-ALREADY-LOADED TO TRUE.
+
+       1300-LOAD-CURRENT-PAGE.
+      *> Charger les données de la page courante dans les champs
+           IF SEARCH-MODE
+              CONTINUE
+           ELSE
+              COMPUTE WS-START-IDX = (WS-PAGE-NO - 1) * WS-PAGE-SIZE + 1
+              COMPUTE WS-END-IDX = WS-PAGE-NO * WS-PAGE-SIZE
+              IF WS-END-IDX > WS-TABLE-COUNT
+                 MOVE WS-TABLE-COUNT TO WS-END-IDX
+              END-IF
+           END-IF.
+
+       1400-SEND-SCREEN-LIST-MAP.
+      *> Initialisation de base
+           PERFORM 1410-INITIALIZE-MAP
+           PERFORM 1420-HANDLE-PAGINATION-DISPLAY
+           PERFORM 1430-HANDLE-SCREEN-MODE
+           PERFORM 1440-SEND-TO-TERMINAL
+           .
+
+       1410-INITIALIZE-MAP.
+           MOVE LOW-VALUE TO VM0855PO
+           MOVE SPACES TO NVOLO ALERTO MESSAGEO
+           MOVE SPACES TO MOD31O MOD26O MOD21O MOD16O
+                          MOD32O MOD27O MOD22O MOD17O
+                          MOD33O MOD28O MOD23O MOD18O
+                          MOD34O MOD29O MOD24O MOD19O
+                          MOD35O MOD30O MOD25O MOD20O
+           .
+
+       1420-HANDLE-PAGINATION-DISPLAY.
+           IF NOT SEARCH-MODE
+              MOVE WS-PAGE-NO TO WS-PG-NO
+              MOVE WS-MAX-PAGE TO WS-PG-MAX
+              MOVE WS-PAGE-TEXT TO MESSAGEO
+           END-IF
+           .
+      *  GESTION DES MODES D'AFFICHAGE
+       1430-HANDLE-SCREEN-MODE.
+           IF SEARCH-MODE
+              PERFORM 1431-HANDLE-SEARCH-MODE
+           ELSE
+              PERFORM 1432-HANDLE-NORMAL-MODE
+           END-IF
+           .
+
+       1431-HANDLE-SEARCH-MODE.
+      *> MODE RECHERCHE - afficher le résultat de la recherche
+           MOVE WS-NVOL-SAISIE TO NVOLO
+           IF WS-TABLE-COUNT > 0
+              MOVE 'Vol trouve' TO ALERTO
+              MOVE WS-MY-NUMERO-VOL(1)   TO MOD31O
+              MOVE WS-MY-DATE-DEPART(1)   TO MOD26O
+              MOVE WS-MY-DATE-ARRIVEE(1)  TO MOD21O
+              MOVE WS-MY-VILLE-ARRIVEE(1) TO MOD16O
+           ELSE
+              MOVE 'Aucun vol trouve' TO ALERTO
+           END-IF
+           .
+
+       1432-HANDLE-NORMAL-MODE.
+      *> MODE NORMAL - afficher la pagination complète
+           PERFORM 1433-HANDLE-MESSAGES
+           PERFORM 1434-DISPLAY-PAGINATED-DATA
+           .
+
+       1433-HANDLE-MESSAGES.
+           IF NOT-FIRST-ACCESS AND NO-PAGINATION-MODE
+      *> Après le premier ENTER - message "Veuillez saisir"
+              MOVE SPACES TO NVOLO
+              MOVE 'Veuillez saisir un numero de vol' TO ALERTO
+           ELSE
+      *> Premier accès OU mode pagination - pas de message
+              MOVE SPACES TO NVOLO
+              MOVE SPACES TO ALERTO
+           END-IF
+           SET NO-PAGINATION-MODE TO TRUE
+           .
+
+       1434-DISPLAY-PAGINATED-DATA.
+      *> Affichage des données paginées
+           COMPUTE WS-INDEX = (WS-PAGE-NO - 1) * WS-PAGE-SIZE + 1
+           MOVE 1 TO WS-I
+
+           PERFORM UNTIL WS-I > WS-PAGE-SIZE
+                OR WS-INDEX > WS-TOTAL-ROWS
+                EVALUATE WS-I
+                    WHEN 1
+                        MOVE WS-MY-NUMERO-VOL(WS-INDEX) TO MOD31O
+                        MOVE WS-MY-DATE-DEPART(WS-INDEX) TO MOD26O
+                        MOVE WS-MY-DATE-ARRIVEE(WS-INDEX) TO MOD21O
+                        MOVE WS-MY-VILLE-ARRIVEE(WS-INDEX) TO MOD16O
+                    WHEN 2
+                        MOVE WS-MY-NUMERO-VOL(WS-INDEX) TO MOD32O
+                        MOVE WS-MY-DATE-DEPART(WS-INDEX) TO MOD27O
+                        MOVE WS-MY-DATE-ARRIVEE(WS-INDEX) TO MOD22O
+                        MOVE WS-MY-VILLE-ARRIVEE(WS-INDEX) TO MOD17O
+                    WHEN 3
+                        MOVE WS-MY-NUMERO-VOL(WS-INDEX) TO MOD33O
+                        MOVE WS-MY-DATE-DEPART(WS-INDEX) TO MOD28O
+                        MOVE WS-MY-DATE-ARRIVEE(WS-INDEX) TO MOD23O
+                        MOVE WS-MY-VILLE-ARRIVEE(WS-INDEX) TO MOD18O
+                    WHEN 4
+                        MOVE WS-MY-NUMERO-VOL(WS-INDEX) TO MOD34O
+                        MOVE WS-MY-DATE-DEPART(WS-INDEX) TO MOD29O
+                        MOVE WS-MY-DATE-ARRIVEE(WS-INDEX) TO MOD24O
+                        MOVE WS-MY-VILLE-ARRIVEE(WS-INDEX) TO MOD19O
+                    WHEN 5
+                        MOVE WS-MY-NUMERO-VOL(WS-INDEX) TO MOD35O
+                        MOVE WS-MY-DATE-DEPART(WS-INDEX) TO MOD30O
+                        MOVE WS-MY-DATE-ARRIVEE(WS-INDEX) TO MOD25O
+                        MOVE WS-MY-VILLE-ARRIVEE(WS-INDEX) TO MOD20O
+                END-EVALUATE
+                ADD 1 TO WS-I
+                ADD 1 TO WS-INDEX
+           END-PERFORM
+           .
+
+       1440-SEND-TO-TERMINAL.
+      *> Envoi final vers le terminal
+           EVALUATE TRUE
+               WHEN SEND-ERASE
+                   EXEC CICS SEND MAP(WS-NOMMAP) MAPSET(WS-NOMMAPSET)
+                            FROM(VM0855PO) ERASE FREEKB
+                   END-EXEC
+               WHEN SEND-DATAONLY
+                   EXEC CICS SEND MAP(WS-NOMMAP) MAPSET(WS-NOMMAPSET)
+                            FROM(VM0855PO) DATAONLY FREEKB
+                   END-EXEC
+               WHEN SEND-DATAONLY-ALARM
+                   EXEC CICS SEND MAP(WS-NOMMAP) MAPSET(WS-NOMMAPSET)
+                            FROM(VM0855PO) DATAONLY ALARM FREEKB
+                   END-EXEC
+           END-EVALUATE
+           .
+
+       1500-SEARCH-VOLS.
+      *> Rechercher un vol par numéro dans la table VOL de DB2
+           MOVE 0 TO WS-TABLE-COUNT
+           MOVE 0 TO SQLCODE
+
+           PERFORM VARYING WS-K FROM 1 BY 1 UNTIL WS-K > 100
+              MOVE SPACES TO WS-MY-ID-VOL(WS-K)
+                             WS-MY-NUMERO-VOL(WS-K)
+                             WS-MY-ORIGINE(WS-K)
+                             WS-MY-VILLE-ARRIVEE(WS-K)
+                             WS-MY-DATE-DEPART(WS-K)
+                             WS-MY-DATE-ARRIVEE(WS-K)
+           END-PERFORM.
+
+           EXEC SQL
+                SELECT CHAR(ID_VOL),
+                       NUMERO_VOL,
+                       ORIGINE,
+                       VILLE_ARRIVEE,
+                       CHAR(DATE_DEPART),
+                       CHAR(DATE_ARRIVEE)
+                INTO :WS-TMP-ID-VOL,
+                     :WS-TMP-NUMERO-VOL,
+                     :WS-TMP-ORIGINE,
+                     :WS-TMP-VILLE-ARRIVEE,
+                     :WS-TMP-DATE-DEPART,
+                     :WS-TMP-DATE-ARRIVEE
+                FROM API5.VOL
+                WHERE NUMERO_VOL = :WS-NVOL-SAISIE
+           END-EXEC.
+
+           IF SQLCODE = 0
+              MOVE WS-TMP-ID-VOL        TO WS-MY-ID-VOL(1)
+              MOVE WS-TMP-NUMERO-VOL    TO WS-MY-NUMERO-VOL(1)
+              MOVE WS-TMP-ORIGINE       TO WS-MY-ORIGINE(1)
+              MOVE WS-TMP-VILLE-ARRIVEE TO WS-MY-VILLE-ARRIVEE(1)
+              MOVE WS-TMP-DATE-DEPART   TO WS-MY-DATE-DEPART(1)
+              MOVE WS-TMP-DATE-ARRIVEE  TO WS-MY-DATE-ARRIVEE(1)
+              MOVE 1 TO WS-TABLE-COUNT
+           END-IF.
+
+       1600-GET-SELECTED-VOL.
+      *> DÉTERMINER LA LIGNE SÉLECTIONNÉE PAR LE CURSEUR
+           MOVE SPACES TO WS-SEL-ID-VOL
+                          WS-SEL-NUMERO-VOL
+
+           COMPUTE WS-START-IDX = (WS-PAGE-NO - 1) * WS-PAGE-SIZE + 1
+
+
+           EVALUATE TRUE
+      *> Ligne 1
+               WHEN EIBCPOSN >= 800 AND EIBCPOSN <= 900
+                  IF WS-START-IDX <= WS-TOTAL-ROWS
+                     MOVE WS-MY-ID-VOL(WS-START-IDX)
+                       TO WS-SEL-ID-VOL
+                     MOVE WS-MY-NUMERO-VOL(WS-START-IDX)
+                       TO WS-SEL-NUMERO-VOL
+                  END-IF
+      *> Ligne 2
+               WHEN EIBCPOSN >= 1000 AND EIBCPOSN <= 1100
+                  IF (WS-START-IDX + 1) <= WS-TOTAL-ROWS
+                     MOVE WS-MY-ID-VOL(WS-START-IDX + 1)
+                       TO WS-SEL-ID-VOL
+                     MOVE WS-MY-NUMERO-VOL(WS-START-IDX + 1)
+                       TO WS-SEL-NUMERO-VOL
+                  END-IF
+      *> Ligne 3
+               WHEN EIBCPOSN >= 1200 AND EIBCPOSN <= 1300
+                  IF (WS-START-IDX + 2) <= WS-TOTAL-ROWS
+                     MOVE WS-MY-ID-VOL(WS-START-IDX + 2)
+                       TO WS-SEL-ID-VOL
+                     MOVE WS-MY-NUMERO-VOL(WS-START-IDX + 2)
+                       TO WS-SEL-NUMERO-VOL
+                  END-IF
+      *> Ligne 4
+               WHEN EIBCPOSN >= 1400 AND EIBCPOSN <= 1500
+                  IF (WS-START-IDX + 3) <= WS-TOTAL-ROWS
+                     MOVE WS-MY-ID-VOL(WS-START-IDX + 3)
+                       TO WS-SEL-ID-VOL
+                     MOVE WS-MY-NUMERO-VOL(WS-START-IDX + 3)
+                       TO WS-SEL-NUMERO-VOL
+                  END-IF
+      *> Ligne 5
+               WHEN EIBCPOSN >= 1600 AND EIBCPOSN <= 1700
+                  IF (WS-START-IDX + 4) <= WS-TOTAL-ROWS
+                     MOVE WS-MY-ID-VOL(WS-START-IDX + 4)
+                       TO WS-SEL-ID-VOL
+                     MOVE WS-MY-NUMERO-VOL(WS-START-IDX + 4)
+                       TO WS-SEL-NUMERO-VOL
+                  END-IF
+           END-EVALUATE.

@@ -1,4 +1,4 @@
-APNSE01  DFHMSD TYPE=&SYSPARM,                                         *
+APNSE04  DFHMSD TYPE=&SYSPARM,                                         *
                MODE=INOUT,                                             *
                LANG=COBOL,                                             *
                STORAGE=AUTO,                                           *
@@ -8,14 +8,13 @@ APNSE01  DFHMSD TYPE=&SYSPARM,                                         *
                TIOAPFX=YES,                                            *
                MAPATTS=(COLOR,HILIGHT,OUTLINE,PS,SOSI),                *
                DSATTS=(COLOR,HILIGHT,OUTLINE,PS,SOSI)
-ACU1     DFHMDI SIZE=(24,80),                                          *
+VIRU1     DFHMDI SIZE=(24,80),                                         *
                COLUMN=1,                                               *
                LINE=1
- DFHMDF                         POS=(15,8),LENGTH=30,                  *
-               INITIAL='Retrait ou Depot (R/D/V/L) :',                 *
-               ATTRB=(ASKIP,NORM),                                     *
-               HILIGHT=OFF,                                            *
-               COLOR=NEUTRAL
+ DFHMDF                         POS=(8,66),LENGTH=0,                   *
+               ATTRB=ASKIP
+ DFHMDF                         POS=(12,66),LENGTH=0,                  *
+               ATTRB=ASKIP
  DFHMDF                         POS=(2,7),LENGTH=66,                   *
                INITIAL='************************************************
                *******************',                                   *
@@ -23,8 +22,8 @@ ACU1     DFHMDI SIZE=(24,80),                                          *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
  DFHMDF                         POS=(3,7),LENGTH=66,                   *
-               INITIAL='************** BIENVENUE SUR LE DAB DE VOTRE BA*
-               NQUE **************',                                   *
+               INITIAL='**************************** MENU VIREMENT *****
+               *******************',                                   *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
@@ -34,67 +33,55 @@ ACU1     DFHMDI SIZE=(24,80),                                          *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
- DFHMDF                         POS=(6,12),LENGTH=54,                  *
-               INITIAL='Bonjour, veuillez rentrer votre numero de carte*
-                bleue ',                                               *
+ DFHMDF                         POS=(5,23),LENGTH=19,                  *
+               INITIAL='Compte Client de : ',                          *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
- DFHMDF                         POS=(7,16),LENGTH=45,                  *
-               INITIAL='et votre identifiant dans le champ ci-dessous',*
+NCPTE DFHMDF          POS=(5,44),LENGTH=15,                            *
+               ATTRB=(ASKIP,NORM),                                     *
+               HILIGHT=OFF,                                            *
+               COLOR=GREEN
+ DFHMDF                         POS=(5,60),LENGTH=0,                   *
+               ATTRB=ASKIP
+ DFHMDF                         POS=(7,2),LENGTH=75,                   *
+               INITIAL='Veuillez renseigner l''identifiant du destinata*
+               ire et le montant du virement',                         *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
- DFHMDF                         POS=(9,12),LENGTH=25,                  *
-               INITIAL='Code de la carte bleue :',                     *
+ DFHMDF                         POS=(10,9),LENGTH=41,                  *
+               INITIAL='Identifiant du destinataire             :',    *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
-PASSCB DFHMDF       POS=(9,39),LENGTH=4,                               *
+INPUTDEP1 DFHMDF POS=(10,53),LENGTH=10,                                *
                ATTRB=(UNPROT,IC,NORM),                                 *
                HILIGHT=UNDERLINE,                                      *
                COLOR=GREEN
- DFHMDF                         POS=(9,44),LENGTH=0,                   *
+ DFHMDF                         POS=(10,64),LENGTH=0,                  *
                ATTRB=ASKIP
- DFHMDF                         POS=(10,12),LENGTH=25,                 *
-               INITIAL='Identifiant Client     :',                     *
+ DFHMDF                         POS=(12,9),LENGTH=41,                  *
+               INITIAL='Veuillez choisir le montant du virement :',    *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=NEUTRAL
-IDCLIENT DFHMDF POS=(10,39),LENGTH=10,                                 *
-               ATTRB=(UNPROT,NORM),                                    *
+INPUTVIR DFHMDF POS=(12,53),LENGTH=4,                                  *
+               ATTRB=(UNPROT,IC,NORM),                                 *
                HILIGHT=UNDERLINE,                                      *
                COLOR=GREEN
- DFHMDF                         POS=(10,50),LENGTH=0,                  *
+ DFHMDF                         POS=(12,58),LENGTH=0,                  *
                ATTRB=ASKIP
- DFHMDF                         POS=(12,8),LENGTH=60,                  *
-               INITIAL='Selectionnez un des champs soit depot soit retr*
-               ait : ',                                                *
-               ATTRB=(ASKIP,NORM),                                     *
-               HILIGHT=OFF,                                            *
-               COLOR=NEUTRAL
-RETDEP DFHMDF       POS=(15,43),LENGTH=1,                              *
-               ATTRB=(UNPROT,NORM),                                    *
-               HILIGHT=UNDERLINE,                                      *
-               COLOR=GREEN
- DFHMDF                         POS=(15,45),LENGTH=0,                  *
-               ATTRB=ASKIP
-MESCB DFHMDF          POS=(18,5),LENGTH=70,                            *
+MESVIR DFHMDF       POS=(17,5),LENGTH=70,                              *
                ATTRB=(UNPROT,NORM),                                    *
                HILIGHT=OFF,                                            *
                COLOR=YELLOW
- DFHMDF                         POS=(18,76),LENGTH=0,                  *
+ DFHMDF                         POS=(17,76),LENGTH=0,                  *
                ATTRB=ASKIP
-MESDEPRET DFHMDF POS=(20,5),LENGTH=70,                                 *
-               ATTRB=(UNPROT,NORM),                                    *
-               HILIGHT=OFF,                                            *
-               COLOR=YELLOW
- DFHMDF                         POS=(20,76),LENGTH=0,                  *
-               ATTRB=ASKIP
- DFHMDF                         POS=(22,3),LENGTH=69,                  *
+ DFHMDF                         POS=(21,5),LENGTH=69,                  *
                INITIAL='F1: HELP ; F2: SPLIT ; F3 : RETOUR ; ',        *
                ATTRB=(ASKIP,NORM),                                     *
                HILIGHT=OFF,                                            *
                COLOR=BLUE
-APNSE01  DFHMSD TYPE=FINAL
+APNSE04  DFHMSD TYPE=FINAL
          END
